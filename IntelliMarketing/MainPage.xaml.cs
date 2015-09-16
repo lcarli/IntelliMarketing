@@ -104,7 +104,6 @@ namespace IntelliMarketing
             //createListFaceID();
             inicializar();
             ajustes();
-            Page.Navigate(new Uri("http://www.chapeupanama.com.br/site/index.php?route=product/product&product_id=42"));
         }
 
 
@@ -120,45 +119,48 @@ namespace IntelliMarketing
             var qualifiers = Windows.ApplicationModel.Resources.Core.ResourceContext.GetForCurrentView().QualifierValues;
             deviceFamily = qualifiers["DeviceFamily"];
 
-            //var rsas = Windows.UI.ViewManagement.UISettings;
-
             double Width = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().VisibleBounds.Width;
             double Height = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().VisibleBounds.Height;
+
 
             if (deviceFamily == "Mobile")
             {
                 //Content.Visibility = Visibility.Collapsed;
 
-                MainGrid.ColumnDefinitions[0].Width = new GridLength(Width * 0.99);
-                MainGrid.ColumnDefinitions[1].Width = new GridLength(Width * 0.01);
-                MainGrid.RowDefinitions[0].Height = new GridLength(Height * 0.27);
-                MainGrid.RowDefinitions[1].Height = new GridLength(Height * 0.72);
+                //MainGrid.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
+                //MainGrid.ColumnDefinitions[1].Width = new GridLength(0);
+                //MainGrid.RowDefinitions[0].Height = new GridLength(Height * 0.27);
+                //MainGrid.RowDefinitions[1].Height = new GridLength(Height * 0.72);
+
+                MainGrid.ColumnDefinitions[1].Width = new GridLength(0);
 
                 Page.SetValue(Grid.ColumnProperty, 0);
                 Page.SetValue(Grid.RowProperty, 1);
                 Page.Margin = new Thickness(Width * 0.026);
 
-                HoldCamera.Margin = new Thickness(Width * 0.06);
-                LeftPanel.Margin = new Thickness(Width * 0.06);
+                //HoldCamera.Margin = new Thickness(Width * 0.06);
+                //LeftPanel.Margin = new Thickness(Width * 0.06);
                 Rotate();
             }
             else
             {
-                MainGrid.ColumnDefinitions[0].Width = new GridLength(Width * 0.27);
-                MainGrid.ColumnDefinitions[1].Width = new GridLength(Width * 0.72);
-                MainGrid.RowDefinitions[0].Height = new GridLength(Height * 0.27);
-                MainGrid.RowDefinitions[1].Height = new GridLength(Height * 0.72);
+                //MainGrid.ColumnDefinitions[0].Width = new GridLength(Width * 0.27);
+                //MainGrid.ColumnDefinitions[1].Width = new GridLength(Width * 0.72);
+                //MainGrid.RowDefinitions[0].Height = new GridLength(Height * 0.27);
+                //MainGrid.RowDefinitions[1].Height = new GridLength(Height * 0.72);
 
-                GridLength minWidth = new GridLength(300);
-                GridLength mg = MainGrid.ColumnDefinitions[0].Width;
+                //GridLength minWidth = new GridLength(300);
+                //GridLength mg = MainGrid.ColumnDefinitions[0].Width;
 
-                if (mg.Value < minWidth.Value)
-                {
-                    MainGrid.ColumnDefinitions[0].Width = minWidth;
-                }
+                //if (mg.Value < minWidth.Value)
+                //{
+                //    MainGrid.ColumnDefinitions[0].Width = minWidth;
+                //    HoldCamera.Margin = new Thickness(300 * 0.026);
+                //    LeftPanel.Margin = new Thickness(300 * 0.026);
+                //}
 
-                HoldCamera.Margin = new Thickness(Width * 0.026);
-                LeftPanel.Margin = new Thickness(Width * 0.026);
+                //HoldCamera.Margin = new Thickness(Width * 0.026);
+                //LeftPanel.Margin = new Thickness(Width * 0.026);
                 //ProductImage.Margin = new Thickness(Width * 0.026);
                 //Content.Margin = new Thickness(Width * 0.026);
                 //ProductName.Margin = new Thickness(Width * 0.015625, Height * 0.027777, Width * 0.15625, Height * 0.925925);
@@ -463,6 +465,7 @@ namespace IntelliMarketing
                 faces = await faceServiceClient.DetectAsync(s, true, true, true, true);
                 age = faces[0].Attributes.Age.ToString();
                 gender = faces[0].Attributes.Gender.ToString();
+                age_genre.Text = gender + " - " + age + " years";
                 var faceIds = faces.Select(face => face.FaceId).ToArray();
                 var results = await faceServiceClient.IdentifyAsync(personGroupId, faceIds);
 
@@ -662,6 +665,7 @@ namespace IntelliMarketing
                     Person p = await identifyFace(file.Path);
                     textAge.Margin = new Thickness(faceRects[0].Left / 2.2 + ((faceRects[0].Width / 2) / 5 * 2), (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 25, 0, 0);
                     textAge.Text = age;
+                    age_genre.Visibility = Visibility.Visible;
                     polAge.Stroke = new SolidColorBrush(Colors.Black);
                     if (gender == "male")
                     {
@@ -739,6 +743,8 @@ namespace IntelliMarketing
             }
             else
             {
+                age_genre.Text = "";
+                age_genre.Visibility = Visibility.Collapsed;
                 pname = "";
                 age = "";
                 gender = "";

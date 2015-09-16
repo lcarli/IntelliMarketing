@@ -6,18 +6,79 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-
-    <Grid x:Name="MainGrid" Background="#9DD9DD" >
-        <VisualStateManager.VisualStateGroups>
+    <Viewbox>
+        <Grid x:Name="MainGrid" Background="#9DD9DD" >
+            <!--<VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="VisualStateGroup">
                 <VisualState x:Name="VisualStateFullHD">
+                    <VisualState.Setters>
+                        <Setter Target="MainGrid.(FrameworkElement.Height)" Value="1080"/>
+                        <Setter Target="MainGrid.(FrameworkElement.Width)" Value="1920"/>
+                        <Setter Target="canvasImage.(FrameworkElement.Height)" Value="350"/>
+                        <Setter Target="HoldCamera.(FrameworkElement.Height)" Value="350"/>
+                        <Setter Target="myImage.(FrameworkElement.Height)" Value="350"/>
+                        <Setter Target="LeftPanel.(FrameworkElement.Height" Value="350"/>
+                    </VisualState.Setters>
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="1920"/>
                     </VisualState.StateTriggers>
                 </VisualState>
+                <VisualState x:Name="VisualStateXHD">
+                    <VisualState.Setters>
+                        <Setter Target="MainGrid.(FrameworkElement.Height)" Value="1050"/>
+                        <Setter Target="MainGrid.(FrameworkElement.Width)" Value="1680"/>
+                        <Setter Target="canvasImage.(FrameworkElement.Height)" Value="300"/>
+                        <Setter Target="HoldCamera.(FrameworkElement.Height)" Value="300"/>
+                        <Setter Target="myImage.(FrameworkElement.Height)" Value="300"/>
+                        <Setter Target="LeftPanel.(FrameworkElement.Height" Value="300"/>
+                    </VisualState.Setters>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1680"/>
+                    </VisualState.StateTriggers>
+                </VisualState>
+                <VisualState x:Name="VisualStateSHD">
+                    <VisualState.Setters>
+                        <Setter Target="MainGrid.(FrameworkElement.Height)" Value="900"/>
+                        <Setter Target="MainGrid.(FrameworkElement.Width)" Value="1600"/>
+                        <Setter Target="canvasImage.(FrameworkElement.Height)" Value="280"/>
+                        <Setter Target="HoldCamera.(FrameworkElement.Height)" Value="280"/>
+                        <Setter Target="myImage.(FrameworkElement.Height)" Value="280"/>
+                        <Setter Target="LeftPanel.(FrameworkElement.Height" Value="280"/>
+                    </VisualState.Setters>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1600"/>
+                    </VisualState.StateTriggers>
+                </VisualState>
+                <VisualState x:Name="VisualStatePHD">
+                    <VisualState.Setters>
+                        <Setter Target="MainGrid.(FrameworkElement.Height)" Value="900"/>
+                        <Setter Target="MainGrid.(FrameworkElement.Width)" Value="1440"/>
+                        <Setter Target="canvasImage.(FrameworkElement.Height)" Value="280"/>
+                        <Setter Target="HoldCamera.(FrameworkElement.Height)" Value="280"/>
+                        <Setter Target="myImage.(FrameworkElement.Height)" Value="280"/>
+                        <Setter Target="LeftPanel.(FrameworkElement.Height" Value="280"/>
+                    </VisualState.Setters>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1440"/>
+                    </VisualState.StateTriggers>
+                </VisualState>
+                <VisualState x:Name="VisualStateHHD">
+                    <VisualState.Setters>
+                        <Setter Target="MainGrid.(FrameworkElement.Height)" Value="768"/>
+                        <Setter Target="MainGrid.(FrameworkElement.Width)" Value="1366"/>
+                        <Setter Target="canvasImage.(FrameworkElement.Height)" Value="260"/>
+                        <Setter Target="HoldCamera.(FrameworkElement.Height)" Value="260"/>
+                        <Setter Target="myImage.(FrameworkElement.Height)" Value="260"/>
+                        <Setter Target="LeftPanel.(FrameworkElement.Height" Value="260"/>
+                    </VisualState.Setters>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1366"/>
+                    </VisualState.StateTriggers>
+                </VisualState>
                 <VisualState x:Name="VisualStateHD">
                     <VisualState.Setters>
-                        <!--<Setter Target="stackAds.(UIElement.Visibility)" Value="Collapsed"/>-->
+                        <Setter Target="MainGrid.(FrameworkElement.Height)" Value="720"/>
+                        <Setter Target="MainGrid.(FrameworkElement.Width)" Value="1280"/>
                         <Setter Target="canvasImage.(FrameworkElement.Height)" Value="200"/>
                         <Setter Target="HoldCamera.(FrameworkElement.Height)" Value="200"/>
                         <Setter Target="myImage.(FrameworkElement.Height)" Value="200"/>
@@ -28,50 +89,43 @@
                 </VisualState>
                 <VisualState x:Name="VisualStateLess">
                     <VisualState.Setters>
-                        <!--<Setter Target="stackAds.(UIElement.Visibility)" Value="Collapsed"/>-->
                         <Setter Target="canvasImage.(FrameworkElement.Height)" Value="200"/>
                         <Setter Target="HoldCamera.(FrameworkElement.Height)" Value="200"/>
                         <Setter Target="myImage.(FrameworkElement.Height)" Value="200"/>
-                        <!--<Setter Target="Content.(UIElement.Visibility)" Value="Collapsed"/>-->
                     </VisualState.Setters>
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="1"/>
                     </VisualState.StateTriggers>
                 </VisualState>
             </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="300"/>
-            <RowDefinition Height="780"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="550"/>
-            <ColumnDefinition Width="1370"/>
-        </Grid.ColumnDefinitions>
-        <Image Source="Assets/Logo/logo.png" Grid.Column="0" Grid.Row="0" Tapped="Image_Tapped"/>
-        <StackPanel x:Name="LeftPanel"
+        </VisualStateManager.VisualStateGroups>-->
+            <Grid.RowDefinitions>
+                <RowDefinition Height="583"/>
+                <RowDefinition Height="1577"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1106"/>
+                <ColumnDefinition Width="2990"/>
+            </Grid.ColumnDefinitions>
+            <Image Source="Assets/Logo/logo.png" Grid.Column="0" Grid.Row="0" Tapped="Image_Tapped"/>
+            <Grid x:Name="LeftPanel"
                     Background="White"
-                    Grid.Column="0" Grid.Row="1" Margin="50"
-                    MinWidth="300">
-            <Canvas x:Name="canvasImage" 
-                    Width="350" Height="275"
-                    Margin="0,25,0,0">
-                <Image x:Name="myImage" 
-                       Width="307" 
-                       Height="217" RenderTransformOrigin="0.529,0.537"/>
-                <Rectangle x:Name="rectFace"
-                           StrokeThickness="5" 
-                           Stroke="Transparent"/>
-                <Polygon x:Name="polAge" 
-                         StrokeThickness="1">
-
-                </Polygon>
-                <TextBlock Foreground="Black" x:Name="textAge"></TextBlock>
-            </Canvas>
-            <CaptureElement x:Name="HoldCamera" Margin="50" Height="275"/>
-        </StackPanel>
+                    Grid.Column="0" Grid.Row="1" Margin="50">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50*"/>
+                    <RowDefinition Height="50*"/>
+                </Grid.RowDefinitions>
+                <Canvas x:Name="canvasImage" Grid.Row="0" Margin="50">
+                    <Image x:Name="myImage" Width="896" Height="629"/>
+                    <Rectangle x:Name="rectFace" StrokeThickness="5" Stroke="Transparent"/>
+                    <Polygon x:Name="polAge" StrokeThickness="1"/>
+                    <TextBlock Foreground="Black" x:Name="textAge"/>
+                </Canvas>
+                <CaptureElement x:Name="HoldCamera" Margin="50" Grid.Row="1"/>
+            </Grid>
             <WebView x:Name="Page" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Margin="50" Visibility="Collapsed"/>
-        <!--<Grid x:Name="Content" Background="White" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Margin="50">
+            <TextBlock x:Name="age_genre" HorizontalAlignment="Center" TextWrapping="Wrap" VerticalAlignment="Bottom" Grid.Row="0" Height="97" Width="1106" FontSize="64" TextAlignment="Center" Visibility="Collapsed"/>
+            <!--<Grid x:Name="Content" Background="White" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Margin="50">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="80*"/>
                 <ColumnDefinition Width="40*"/>
@@ -92,5 +146,6 @@
                 <Image x:Name="ad5" Source="Assets/Logo/logo.png"></Image>
             </StackPanel>
         </Grid>-->
-    </Grid>
+        </Grid>
+    </Viewbox>
 </Page>
