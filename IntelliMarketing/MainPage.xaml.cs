@@ -83,6 +83,9 @@ namespace IntelliMarketing
         //GroupID
         string personGroupId = "mscm";
 
+        //Timer
+        DispatcherTimer timer;
+
         //Contador
         int contagem;
 
@@ -124,8 +127,27 @@ namespace IntelliMarketing
             //createListFaceID();
             inicializar();
             ajustes();
+            cortanaAction();
         }
 
+        #region Cortana Method
+        private void cortanaAction()
+        {
+            if (App.cortana)
+            {
+                timer = new DispatcherTimer();
+                timer.Interval = new TimeSpan(0, 0, 0, 3, 0);
+                timer.Tick += Timer_Tick;
+                timer.Start();
+            }
+        }
+
+        private void Timer_Tick(object sender, object e)
+        {
+            captureElement();
+        }
+
+        #endregion
 
         #region Init Methods
 

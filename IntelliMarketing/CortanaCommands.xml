@@ -12,9 +12,9 @@
     </Command>
     
     <Command Name="takePhoto">
-      <Example> Take Photo </Example>
-      <ListenFor> Take Photo </ListenFor>
-      <Feedback> Taking </Feedback>
+      <Example> Take a Picture </Example>
+      <ListenFor> [would] [you] [please] [take] [a] Picture [of] [me] [please] </ListenFor>
+      <Feedback> Taking a picture of you </Feedback>
       <Navigate/>
     </Command>
 

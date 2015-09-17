@@ -38,6 +38,7 @@ namespace IntelliMarketing
 
         public static MobileServiceClient MobileService = new MobileServiceClient("https://pushteste.azure-mobile.net/",
                         "IvphFCBosbDnVLaMuCdrCGGHVbzydY85");
+        public static bool cortana = false;
 
         public App()
         {
@@ -87,7 +88,14 @@ namespace IntelliMarketing
 
             if (ConnectedToInternet())
             {
-                await InitNotificationsAsync();
+                try
+                {
+                    await InitNotificationsAsync();
+                }
+                catch (Exception)
+                {
+                    
+                }
             }
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
@@ -178,6 +186,7 @@ namespace IntelliMarketing
                 switch (voiceCommandName)
                 {
                     case "takePhoto":
+                        cortana = true;
                         break;
                     default:
                         System.Diagnostics.Debug.WriteLine("Unknown command");
