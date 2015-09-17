@@ -21,6 +21,7 @@ using Newtonsoft.Json.Linq;
 using Windows.Storage;
 using Windows.ApplicationModel.VoiceCommands;
 using Windows.Media.SpeechRecognition;
+using Windows.Networking.Connectivity;
 
 namespace IntelliMarketing
 {
@@ -84,7 +85,10 @@ namespace IntelliMarketing
                 System.Diagnostics.Debug.WriteLine("There was an error registering the Voice Command Definitions", ex);
             }
 
-            await InitNotificationsAsync();
+            if (ConnectedToInternet())
+            {
+                await InitNotificationsAsync();
+            }
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {
@@ -144,6 +148,19 @@ namespace IntelliMarketing
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity
             deferral.Complete();
+        }
+
+        private bool ConnectedToInternet()
+        {
+            ConnectionProfile InternetConnectionProfile = NetworkInformation.GetInternetConnectionProfile();
+
+            if (InternetConnectionProfile == null)
+            {
+                return false;
+            }
+
+            var level = InternetConnectionProfile.GetNetworkConnectivityLevel();
+            return level == NetworkConnectivityLevel.InternetAccess;
         }
 
         protected override void OnActivated(IActivatedEventArgs e)

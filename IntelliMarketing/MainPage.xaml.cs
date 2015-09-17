@@ -40,6 +40,8 @@ using Windows.Graphics;
 using Windows.Storage.FileProperties;
 using Windows.Foundation.Metadata;
 using Windows.Phone.UI.Input;
+using Windows.Networking.Connectivity;
+using Windows.UI.Popups;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -875,21 +877,44 @@ namespace IntelliMarketing
 
         #endregion
 
+        #region Verify Connection
+        private bool ConnectedToInternet()
+        {
+            ConnectionProfile InternetConnectionProfile = NetworkInformation.GetInternetConnectionProfile();
+
+            if (InternetConnectionProfile == null)
+            {
+                return false;
+            }
+
+            var level = InternetConnectionProfile.GetNetworkConnectivityLevel();
+            return level == NetworkConnectivityLevel.InternetAccess;
+        }
+        #endregion
+
         #region General Methods
         public async void captureElement()
         {
-            var stream = new InMemoryRandomAccessStream();
-            await mc.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), stream);
-            var photoOrientation = ConvertOrientationToPhotoOrientation(GetCameraOrientation());
-            string uriPhoto = await ReencodeAndSavePhotoAsync(stream, photoOrientation);
+            if (ConnectedToInternet())
+            {
+                var stream = new InMemoryRandomAccessStream();
+                await mc.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), stream);
+                var photoOrientation = ConvertOrientationToPhotoOrientation(GetCameraOrientation());
+                string uriPhoto = await ReencodeAndSavePhotoAsync(stream, photoOrientation);
 
-            BitmapImage bmpImage = new BitmapImage(new Uri(uriPhoto));
+                BitmapImage bmpImage = new BitmapImage(new Uri(uriPhoto));
 
-            // imagePreivew is a <Image> object defined in XAML
-            myImage.Source = bmpImage;
+                // imagePreivew is a <Image> object defined in XAML
+                myImage.Source = bmpImage;
 
-            //Recognize Someone
-            Recognize(uriPhoto);
+                //Recognize Someone
+                Recognize(uriPhoto);
+            }
+            else
+            {
+                MessageDialog msg = new MessageDialog("No internet is avaiable. Please, check your connection.");
+                await msg.ShowAsync();
+            }
         }
 
         private void setProduct(string nome)
