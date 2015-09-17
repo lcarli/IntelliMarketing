@@ -42,6 +42,7 @@ using Windows.Foundation.Metadata;
 using Windows.Phone.UI.Input;
 using Windows.Networking.Connectivity;
 using Windows.UI.Popups;
+using IntelliMarketing.Common;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -86,6 +87,9 @@ namespace IntelliMarketing
         //Timer
         DispatcherTimer timer;
 
+        //NavigationHelper
+        private NavigationHelper navigationHelper;
+
         //Contador
         int contagem;
 
@@ -127,22 +131,32 @@ namespace IntelliMarketing
             //createListFaceID();
             inicializar();
             ajustes();
+            this.navigationHelper = new NavigationHelper(this);
+            this.navigationHelper.LoadState += navigationHelper_LoadState;
         }
 
-        public MainPage(string command)
+        private void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-            Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
-            this.InitializeComponent();
-            listFaceID = new List<Face>();
-            //createListFaceID();
-            inicializar();
-            ajustes();
-            if (command != null)
+            if (e.NavigationParameter.ToString() == "takePhoto")
             {
-                cortanaAction(command);
+                cortanaAction(e.NavigationParameter.ToString());
             }
         }
 
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            navigationHelper.OnNavigatedTo(e);
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            navigationHelper.OnNavigatedFrom(e);
+        }
+
+        public NavigationHelper NavigationHelper
+        {
+            get { return this.navigationHelper; }
+        }
 
         #region Cortana Method
         private void cortanaAction(string command)
@@ -1014,7 +1028,7 @@ namespace IntelliMarketing
 
         private void HardwareButtons_CameraPressed(object sender, CameraEventArgs e)
         {
-           captureElement();
+            captureElement();
         }
 
         #endregion
