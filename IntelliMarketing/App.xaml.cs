@@ -22,6 +22,7 @@ using Windows.Storage;
 using Windows.ApplicationModel.VoiceCommands;
 using Windows.Media.SpeechRecognition;
 using Windows.Networking.Connectivity;
+using IntelliMarketing.Services.NavigationService;
 
 namespace IntelliMarketing
 {
@@ -38,7 +39,7 @@ namespace IntelliMarketing
 
         public static MobileServiceClient MobileService = new MobileServiceClient("https://pushteste.azure-mobile.net/",
                         "IvphFCBosbDnVLaMuCdrCGGHVbzydY85");
-        public static bool cortana = false;
+        public static NavigationService NavigationService { get; private set; }
 
         public App()
         {
@@ -76,6 +77,7 @@ namespace IntelliMarketing
         /// <param name="e">Details about the launch request and process.</param>
         protected async override void OnLaunched(LaunchActivatedEventArgs e)
         {
+            
             try
             {
                 StorageFile vcdStorageFile = await Package.Current.InstalledLocation.GetFileAsync(@"CortanaCommands.xml");
@@ -94,7 +96,7 @@ namespace IntelliMarketing
                 }
                 catch (Exception)
                 {
-                    
+
                 }
             }
 #if DEBUG
@@ -111,7 +113,7 @@ namespace IntelliMarketing
             {
                 // Create a Frame to act as the navigation context and navigate to the first page
                 rootFrame = new Frame();
-
+                App.NavigationService = new NavigationService(rootFrame);
                 rootFrame.NavigationFailed += OnNavigationFailed;
 
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
@@ -173,6 +175,8 @@ namespace IntelliMarketing
 
         protected override void OnActivated(IActivatedEventArgs e)
         {
+            Type navigationToPageType = typeof(MainPage);
+            string commands = "";
             // Handle when app is launched by Cortana
             if (e.Kind == ActivationKind.VoiceCommand)
             {
@@ -186,13 +190,41 @@ namespace IntelliMarketing
                 switch (voiceCommandName)
                 {
                     case "takePhoto":
-                        cortana = true;
+                        commands = voiceCommandName;
+                        navigationToPageType = typeof(MainPage);
                         break;
                     default:
+                        commands = "";
+                        navigationToPageType = typeof(MainPage);
                         System.Diagnostics.Debug.WriteLine("Unknown command");
                         break;
                 }
             }
+
+            Frame rootFrame = Window.Current.Content as Frame;
+
+            // Do not repeat app initialization when the Window already has content,
+            // just ensure that the window is active
+            if (rootFrame == null)
+            {
+                // Create a Frame to act as the navigation context and navigate to the first page
+                rootFrame = new Frame();
+                App.NavigationService = new NavigationService(rootFrame);
+
+                rootFrame.NavigationFailed += OnNavigationFailed;
+
+                // Place the frame in the current Window
+                Window.Current.Content = rootFrame;
+            }
+
+            // Since we're expecting to always show a details page, navigate even if 
+            // a content frame is in place (unlike OnLaunched).
+            // Navigate to either the main trip list page, or if a valid voice command
+            // was provided, to the details page for that trip.
+            rootFrame.Navigate(navigationToPageType, commands);
+
+            // Ensure the current window is active
+            Window.Current.Activate();
         }
     }
 }

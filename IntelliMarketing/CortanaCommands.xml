@@ -13,7 +13,7 @@
     
     <Command Name="takePhoto">
       <Example> Take a Picture </Example>
-      <ListenFor> [would] [you] [please] [take] [a] Picture [of] [me] [please] </ListenFor>
+      <ListenFor> [would] [you] [please] [take] [a] [fucking] Picture [of] [me] [please] </ListenFor>
       <Feedback> Taking a picture of you </Feedback>
       <Navigate/>
     </Command>

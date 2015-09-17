@@ -127,13 +127,27 @@ namespace IntelliMarketing
             //createListFaceID();
             inicializar();
             ajustes();
-            cortanaAction();
         }
 
-        #region Cortana Method
-        private void cortanaAction()
+        public MainPage(string command)
         {
-            if (App.cortana)
+            Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+            this.InitializeComponent();
+            listFaceID = new List<Face>();
+            //createListFaceID();
+            inicializar();
+            ajustes();
+            if (command != null)
+            {
+                cortanaAction(command);
+            }
+        }
+
+
+        #region Cortana Method
+        private void cortanaAction(string command)
+        {
+            if (command == "takePhoto")
             {
                 timer = new DispatcherTimer();
                 timer.Interval = new TimeSpan(0, 0, 0, 3, 0);
