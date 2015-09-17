@@ -6,7 +6,7 @@
 
     <Command Name="old">
       <Example> How old am I?  </Example>
-      <ListenFor> How Old </ListenFor>
+      <ListenFor> [would] [you] [please] [tell] [me] How Old [am] [i] [please] </ListenFor>
       <Feedback> Discovering for you right now </Feedback>
       <VoiceCommandService Target="VoiceCommandService"/>
     </Command>

@@ -101,6 +101,19 @@ namespace IntelliMarketing
         //List faces (It's necessary 'cause directory doesn't works.
         private List<Face> listFaceID;
 
+
+        //Create Enum of Errors
+        enum Error
+        {
+            Not_Found,
+            Not_Recognized,
+            No_Face,
+            Expensive
+        };
+
+
+
+
         public MainPage()
         {
             Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
@@ -181,6 +194,8 @@ namespace IntelliMarketing
                 //Price.Margin = new Thickness(Width * 0.3125, Height * 0.027777, Width * 0.015625, Height * 0.185185);
                 //logoStore.Margin = new Thickness(Width * 0.3125, Height * 0.185185, Width * 0.015625, Height * 0.027777);
             }
+
+            RegisterEventHandlers();
         }
 
         private async void inicializar()
@@ -190,7 +205,7 @@ namespace IntelliMarketing
 
         #endregion
 
-        #region Rotate
+        #region Orientation Methods
 
 
         private void OrientationSensor_OrientationChanged(SimpleOrientationSensor sender, SimpleOrientationSensorOrientationChangedEventArgs args)
@@ -420,7 +435,7 @@ namespace IntelliMarketing
             catch (Exception)
             {
                 //msgBox.Text = "Face not detected";
-                ReadVoice("face");
+                ReadVoice(Error.No_Face);
             }
         }
         #endregion
@@ -734,32 +749,32 @@ namespace IntelliMarketing
                     {
                         pname = p.Name;
                         setProduct(p.Name);
-                        ReadVoice(p.Name);
+                        ReadVoiceName(p.Name);
                     }
                     else
                     {
                         //msgBox.Text = "Face not recognize.";
-                        ReadVoice("error");
+                        ReadVoice(Error.Not_Recognized);
                     }
                 }
                 catch (Exception e)
                 {
                     //msgBox.Text = "Face not detected";
-                    ReadVoice("face");
+                    ReadVoice(Error.No_Face);
                 }
             }
             else
             {
                 //msgBox.Text = "Face not detected. Please take another photo.";
                 //myImage.Source = null;
-                ReadVoice("face");
+                ReadVoice(Error.No_Face);
             }
         }
 
         #endregion
 
         #region Voice Synth
-        private async void ReadVoice(string name)
+        private async void ReadVoice(Error name)
         {
             // The media object for controlling and playing audio.
             MediaElement mediaElement = new MediaElement();
@@ -769,31 +784,40 @@ namespace IntelliMarketing
 
             // Generate the audio stream from plain text.
             SpeechSynthesisStream stream;
-            if (name == "error")
+            switch (name)
             {
-                stream = await synth.SynthesizeTextToStreamAsync("Oops! Someone was do not recognized. Please, show me someone that I met before!");
-
+                case Error.Not_Recognized:
+                    stream = await synth.SynthesizeTextToStreamAsync("Oops! Someone was do not recognized. Please, show me someone that I met before!");
+                    break;
+                case Error.No_Face:
+                    stream = await synth.SynthesizeTextToStreamAsync("I can't find a face. Do you really show me someone? Please, try again.");
+                    break;
+                case Error.Not_Found:
+                    stream = await synth.SynthesizeTextToStreamAsync("I can't find another product for you.");
+                    break;
+                case Error.Expensive:
+                    stream = await synth.SynthesizeTextToStreamAsync("You need to order Danilo to raise your paycheck. Let me check another product for you, for now.");
+                    break;
+                default:
+                    stream = await synth.SynthesizeTextToStreamAsync("Hello " + name + "! Let me check some products for you.");
+                    break;
             }
-            else if (name == "face")
-            {
-                stream = await synth.SynthesizeTextToStreamAsync("I can't find a face. Do you really show me someone? Please, try again.");
+            // Send the stream to the media object.
+            mediaElement.SetSource(stream, stream.ContentType);
+            mediaElement.Play();
+        }
 
-            }
-            else if (name == "not")
-            {
-                stream = await synth.SynthesizeTextToStreamAsync("I can't find another product for you.");
+        private async void ReadVoiceName(string name)
+        {
+            // The media object for controlling and playing audio.
+            MediaElement mediaElement = new MediaElement();
 
-            }
-            else if (name == "expensive")
-            {
-                stream = await synth.SynthesizeTextToStreamAsync("You need to order Danilo to raise your paycheck. Let me check another product for you, for now.");
+            // The object for controlling the speech synthesis engine (voice).
+            var synth = new Windows.Media.SpeechSynthesis.SpeechSynthesizer();
 
-            }
-            else
-            {
-                stream = await synth.SynthesizeTextToStreamAsync("Hello " + name + "! Let me check some products for you.");
+            // Generate the audio stream from plain text.
+            SpeechSynthesisStream stream = await synth.SynthesizeTextToStreamAsync("Hello " + name + "! Let me check some products for you.");
 
-            }
             // Send the stream to the media object.
             mediaElement.SetSource(stream, stream.ContentType);
             mediaElement.Play();
@@ -814,17 +838,17 @@ namespace IntelliMarketing
                 if (speechRecognitionResult.Text.Contains("expensive") || speechRecognitionResult.Text.Contains("expense"))
                 {
                     //speechText.Text = "So much expensive";
-                    ReadVoice("expensive");
+                    ReadVoice(Error.Not_Found);
                     //pageView.Navigate(new Uri("http://www.americanas.com.br/produto/113151382/carro-eletrico-sport-car-vermelho-6v"));
                 }
                 else
                 {
-                    ReadVoice("not");
+                    ReadVoice(Error.Not_Found);
                 }
             }
             else
             {
-                ReadVoice("not");
+                ReadVoice(Error.Not_Found);
             }
         }
 
@@ -852,32 +876,20 @@ namespace IntelliMarketing
         #endregion
 
         #region General Methods
-        private async void captureElement()
+        public async void captureElement()
         {
-            //ImageEncodingProperties imgFormat = ImageEncodingProperties.CreateJpeg();
-
-            //StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync(
-            //    "Face.png",
-            //    CreationCollisionOption.ReplaceExisting);
-
-            //// take photo
-            //await mc.CapturePhotoToStorageFileAsync(imgFormat, file);
-
-            //// Get photo as a BitmapImage
-            //BitmapImage bmpImage = new BitmapImage(new Uri(file.Path));
-
             var stream = new InMemoryRandomAccessStream();
             await mc.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), stream);
             var photoOrientation = ConvertOrientationToPhotoOrientation(GetCameraOrientation());
-            string c = await ReencodeAndSavePhotoAsync(stream, photoOrientation);
+            string uriPhoto = await ReencodeAndSavePhotoAsync(stream, photoOrientation);
 
-            BitmapImage bmpImage2 = new BitmapImage(new Uri(c));
+            BitmapImage bmpImage = new BitmapImage(new Uri(uriPhoto));
 
             // imagePreivew is a <Image> object defined in XAML
-            myImage.Source = bmpImage2;
+            myImage.Source = bmpImage;
 
             //Recognize Someone
-            Recognize(c);
+            Recognize(uriPhoto);
         }
 
         private void setProduct(string nome)
@@ -899,6 +911,7 @@ namespace IntelliMarketing
                     //logoStore.Source = logo;
                     break;
                 case "Hara":
+                    Page.Navigate(new Uri("http://www.amazon.com/Nikon-Digital-1080p-Video-MODEL/dp/B006U49XM6/ref=sr_1_2?ie=UTF8&qid=1442487669&sr=8-2&keywords=nikon+d4"));
                     //product.UriSource = new Uri("Halo5.jpg", UriKind.Relative);
                     //ProductImage.Source = product;
                     //ProductName.Text = "Halo 5 - Xbox One";
@@ -913,6 +926,7 @@ namespace IntelliMarketing
 
         private void Image_Tapped(object sender, TappedRoutedEventArgs e)
         {
+            //Verify if product was showed and reset setup.
             if (Page.Visibility == Visibility.Visible)
             {
                 age_genre.Text = "";

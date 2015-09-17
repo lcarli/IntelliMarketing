@@ -28,8 +28,8 @@ namespace CortanaC
                 {
                     case "old":
                         VoiceCommandUserMessage userMessage = new VoiceCommandUserMessage();
-                        userMessage.DisplayMessage = "The current temperature is 23 degrees";
-                        userMessage.SpokenMessage = "The current temperature is 23 degrees";
+                        //userMessage.DisplayMessage = "The current temperature is 23 degrees";
+                        //userMessage.SpokenMessage = "The current temperature is 23 degrees";
 
                         VoiceCommandResponse response = VoiceCommandResponse.CreateResponse(userMessage, null);
                         await voiceServiceConnection.ReportSuccessAsync(response);

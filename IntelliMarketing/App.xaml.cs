@@ -56,7 +56,7 @@ namespace IntelliMarketing
             }
             catch (Exception exception)
             {
-                
+
             }
 
         }
@@ -158,12 +158,8 @@ namespace IntelliMarketing
                 string textSpoken = speechRecognitionResult.Text;
                 //IReadOnlyList<string> recognizedVoiceCommandPhrases;
 
-                System.Diagnostics.Debug.WriteLine("voiceCommandName: " + voiceCommandName);
-                System.Diagnostics.Debug.WriteLine("textSpoken: " + textSpoken);
-
                 switch (voiceCommandName)
                 {
-
                     case "takePhoto":
                         break;
                     default:
@@ -172,6 +168,5 @@ namespace IntelliMarketing
                 }
             }
         }
-
     }
 }
