@@ -18,6 +18,9 @@ using Windows.UI.Xaml.Navigation;
 using System.Threading.Tasks;
 using Windows.Networking.PushNotifications;
 using Newtonsoft.Json.Linq;
+using Windows.Storage;
+using Windows.ApplicationModel.VoiceCommands;
+using Windows.Media.SpeechRecognition;
 
 namespace IntelliMarketing
 {
@@ -71,6 +74,16 @@ namespace IntelliMarketing
         /// <param name="e">Details about the launch request and process.</param>
         protected async override void OnLaunched(LaunchActivatedEventArgs e)
         {
+            try
+            {
+                StorageFile vcdStorageFile = await Package.Current.InstalledLocation.GetFileAsync(@"CortanaCommands.xml");
+                await VoiceCommandDefinitionManager.InstallCommandDefinitionsFromStorageFileAsync(vcdStorageFile);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("There was an error registering the Voice Command Definitions", ex);
+            }
+
             await InitNotificationsAsync();
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
@@ -132,5 +145,33 @@ namespace IntelliMarketing
             //TODO: Save application state and stop any background activity
             deferral.Complete();
         }
+
+        protected override void OnActivated(IActivatedEventArgs e)
+        {
+            // Handle when app is launched by Cortana
+            if (e.Kind == ActivationKind.VoiceCommand)
+            {
+                VoiceCommandActivatedEventArgs commandArgs = e as VoiceCommandActivatedEventArgs;
+                SpeechRecognitionResult speechRecognitionResult = commandArgs.Result;
+
+                string voiceCommandName = speechRecognitionResult.RulePath[0];
+                string textSpoken = speechRecognitionResult.Text;
+                //IReadOnlyList<string> recognizedVoiceCommandPhrases;
+
+                System.Diagnostics.Debug.WriteLine("voiceCommandName: " + voiceCommandName);
+                System.Diagnostics.Debug.WriteLine("textSpoken: " + textSpoken);
+
+                switch (voiceCommandName)
+                {
+
+                    case "takePhoto":
+                        break;
+                    default:
+                        System.Diagnostics.Debug.WriteLine("Unknown command");
+                        break;
+                }
+            }
+        }
+
     }
 }

@@ -117,9 +117,9 @@
                 </Grid.RowDefinitions>
                 <Canvas x:Name="canvasImage" Grid.Row="0" Margin="50">
                     <Image x:Name="myImage" Width="896" Height="629"/>
-                    <Rectangle x:Name="rectFace" StrokeThickness="5" Stroke="Transparent"/>
-                    <Polygon x:Name="polAge" StrokeThickness="1"/>
-                    <TextBlock Foreground="Black" x:Name="textAge"/>
+                    <Rectangle x:Name="rectFace" StrokeThickness="5" Stroke="Transparent" Visibility="Collapsed"/>
+                    <Polygon x:Name="polAge" StrokeThickness="1" Visibility="Collapsed"/>
+                    <TextBlock Foreground="Black" x:Name="textAge" Visibility="Collapsed"/>
                 </Canvas>
                 <CaptureElement x:Name="HoldCamera" Margin="50" Grid.Row="1"/>
             </Grid>

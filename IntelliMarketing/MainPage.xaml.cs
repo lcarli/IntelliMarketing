@@ -37,6 +37,9 @@ using Windows.Media.SpeechRecognition;
 using Windows.Networking.PushNotifications;
 using Microsoft.WindowsAzure.MobileServices;
 using Windows.Graphics;
+using Windows.Storage.FileProperties;
+using Windows.Foundation.Metadata;
+using Windows.Phone.UI.Input;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -53,6 +56,7 @@ namespace IntelliMarketing
         //Inicializate Camera
         MediaCapture mc;
         private bool _isInitialized;
+        private bool _isPreviewing;
         private bool _externalCamera;
         private bool _mirroringPreview;
         private IMediaEncodingProperties _previewProperties;
@@ -62,6 +66,7 @@ namespace IntelliMarketing
         private readonly SimpleOrientationSensor _orientationSensor = SimpleOrientationSensor.GetDefault();
         //private SimpleOrientation _deviceOrientation = SimpleOrientation.NotRotated;
         private DisplayOrientations _displayOrientation = DisplayOrientations.Portrait;
+        private SimpleOrientation _deviceOrientation = SimpleOrientation.NotRotated;
         private static readonly Guid RotationKey = new Guid("C380465D-2271-428C-9B83-ECEA3B4A85C1");
 
         // Prevent the screen from sleeping while the camera is running
@@ -122,15 +127,20 @@ namespace IntelliMarketing
             double Width = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().VisibleBounds.Width;
             double Height = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().VisibleBounds.Height;
 
+            _displayOrientation = _displayInformation.CurrentOrientation;
+            if (_orientationSensor != null)
+            {
+                _deviceOrientation = _orientationSensor.GetCurrentOrientation();
+            }
 
             if (deviceFamily == "Mobile")
             {
                 //Content.Visibility = Visibility.Collapsed;
 
-                //MainGrid.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
-                //MainGrid.ColumnDefinitions[1].Width = new GridLength(0);
-                //MainGrid.RowDefinitions[0].Height = new GridLength(Height * 0.27);
-                //MainGrid.RowDefinitions[1].Height = new GridLength(Height * 0.72);
+                MainGrid.ColumnDefinitions[0].Width = new GridLength(1577 + 723);
+                MainGrid.ColumnDefinitions[1].Width = new GridLength(0);
+                MainGrid.RowDefinitions[0].Height = new GridLength(1106);
+                MainGrid.RowDefinitions[1].Height = new GridLength(2990);
 
                 MainGrid.ColumnDefinitions[1].Width = new GridLength(0);
 
@@ -138,9 +148,13 @@ namespace IntelliMarketing
                 Page.SetValue(Grid.RowProperty, 1);
                 Page.Margin = new Thickness(Width * 0.026);
 
+                myImage.Width = 2100;
+                myImage.Height = 1400;
+
+                //Rotate();
+
                 //HoldCamera.Margin = new Thickness(Width * 0.06);
                 //LeftPanel.Margin = new Thickness(Width * 0.06);
-                Rotate();
             }
             else
             {
@@ -174,15 +188,131 @@ namespace IntelliMarketing
             await InitializeCameraAsync();
         }
 
-#endregion
+        #endregion
 
         #region Rotate
 
-        private void Rotate()
+
+        private void OrientationSensor_OrientationChanged(SimpleOrientationSensor sender, SimpleOrientationSensorOrientationChangedEventArgs args)
         {
-            RotateTransform rt = new RotateTransform();
-            rt.Angle = -90;
-            myImage.RenderTransform = rt;
+            if (args.Orientation != SimpleOrientation.Faceup && args.Orientation != SimpleOrientation.Facedown)
+            {
+                // Only update the current orientation if the device is not parallel to the ground. This allows users to take pictures of documents (FaceUp)
+                // or the ceiling (FaceDown) in portrait or landscape, by first holding the device in the desired orientation, and then pointing the camera
+                // either up or down, at the desired subject.
+                //Note: This assumes that the camera is either facing the same way as the screen, or the opposite way. For devices with cameras mounted
+                //      on other panels, this logic should be adjusted.
+                _deviceOrientation = args.Orientation;
+            }
+        }
+
+        private SimpleOrientation GetCameraOrientation()
+        {
+            if (_externalCamera)
+            {
+                // Cameras that are not attached to the device do not rotate along with it, so apply no rotation
+                return SimpleOrientation.NotRotated;
+            }
+
+            var result = _deviceOrientation;
+
+            // Account for the fact that, on portrait-first devices, the camera sensor is mounted at a 90 degree offset to the native orientation
+            if (_displayInformation.NativeOrientation == DisplayOrientations.Portrait)
+            {
+                switch (result)
+                {
+                    case SimpleOrientation.Rotated90DegreesCounterclockwise:
+                        result = SimpleOrientation.NotRotated;
+                        break;
+                    case SimpleOrientation.Rotated180DegreesCounterclockwise:
+                        result = SimpleOrientation.Rotated90DegreesCounterclockwise;
+                        break;
+                    case SimpleOrientation.Rotated270DegreesCounterclockwise:
+                        result = SimpleOrientation.Rotated180DegreesCounterclockwise;
+                        break;
+                    case SimpleOrientation.NotRotated:
+                        result = SimpleOrientation.Rotated270DegreesCounterclockwise;
+                        break;
+                }
+            }
+
+            // If the preview is being mirrored for a front-facing camera, then the rotation should be inverted
+            if (_mirroringPreview)
+            {
+                // This only affects the 90 and 270 degree cases, because rotating 0 and 180 degrees is the same clockwise and counter-clockwise
+                switch (result)
+                {
+                    case SimpleOrientation.Rotated90DegreesCounterclockwise:
+                        return SimpleOrientation.Rotated270DegreesCounterclockwise;
+                    case SimpleOrientation.Rotated270DegreesCounterclockwise:
+                        return SimpleOrientation.Rotated90DegreesCounterclockwise;
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Converts the given orientation of the device in space to the corresponding rotation in degrees
+        /// </summary>
+        /// <param name="orientation">The orientation of the device in space</param>
+        /// <returns>An orientation in degrees</returns>
+        private static int ConvertDeviceOrientationToDegrees(SimpleOrientation orientation)
+        {
+            switch (orientation)
+            {
+                case SimpleOrientation.Rotated90DegreesCounterclockwise:
+                    return 90;
+                case SimpleOrientation.Rotated180DegreesCounterclockwise:
+                    return 180;
+                case SimpleOrientation.Rotated270DegreesCounterclockwise:
+                    return 270;
+                case SimpleOrientation.NotRotated:
+                default:
+                    return 0;
+            }
+        }
+
+        /// <summary>
+        /// Converts the given orientation of the app on the screen to the corresponding rotation in degrees
+        /// </summary>
+        /// <param name="orientation">The orientation of the app on the screen</param>
+        /// <returns>An orientation in degrees</returns>
+        private static int ConvertDisplayOrientationToDegrees(DisplayOrientations orientation)
+        {
+            switch (orientation)
+            {
+                case DisplayOrientations.Portrait:
+                    return 90;
+                case DisplayOrientations.LandscapeFlipped:
+                    return 180;
+                case DisplayOrientations.PortraitFlipped:
+                    return 270;
+                case DisplayOrientations.Landscape:
+                default:
+                    return 0;
+            }
+        }
+
+        /// <summary>
+        /// Converts the given orientation of the device in space to the metadata that can be added to captured photos
+        /// </summary>
+        /// <param name="orientation">The orientation of the device in space</param>
+        /// <returns></returns>
+        private static PhotoOrientation ConvertOrientationToPhotoOrientation(SimpleOrientation orientation)
+        {
+            switch (orientation)
+            {
+                case SimpleOrientation.Rotated90DegreesCounterclockwise:
+                    return PhotoOrientation.Rotate90;
+                case SimpleOrientation.Rotated180DegreesCounterclockwise:
+                    return PhotoOrientation.Rotate180;
+                case SimpleOrientation.Rotated270DegreesCounterclockwise:
+                    return PhotoOrientation.Rotate270;
+                case SimpleOrientation.NotRotated:
+                default:
+                    return PhotoOrientation.Normal;
+            }
         }
 
         #endregion
@@ -390,7 +520,7 @@ namespace IntelliMarketing
             try
             {
                 await mc.StartPreviewAsync();
-
+                _isPreviewing = true;
                 _previewProperties = mc.VideoDeviceController.GetMediaStreamProperties(MediaStreamType.VideoPreview);
             }
             catch (Exception ex)
@@ -437,23 +567,56 @@ namespace IntelliMarketing
             await mc.SetEncodingPropertiesAsync(MediaStreamType.VideoPreview, props, null);
         }
 
-        private static int ConvertDisplayOrientationToDegrees(DisplayOrientations orientation)
+        private void RegisterEventHandlers()
         {
-            switch (orientation)
+            if (ApiInformation.IsTypePresent("Windows.Phone.UI.Input.HardwareButtons"))
             {
-                case DisplayOrientations.Portrait:
-                    return 90;
-                case DisplayOrientations.LandscapeFlipped:
-                    return 180;
-                case DisplayOrientations.PortraitFlipped:
-                    return 270;
-                case DisplayOrientations.Landscape:
-                default:
-                    return 0;
+                HardwareButtons.CameraPressed += HardwareButtons_CameraPressed;
+            }
+
+            // If there is an orientation sensor present on the device, register for notifications
+            if (_orientationSensor != null)
+            {
+                _orientationSensor.OrientationChanged += OrientationSensor_OrientationChanged;
+
+            }
+
+            _displayInformation.OrientationChanged += DisplayInformation_OrientationChanged;
+            _systemMediaControls.PropertyChanged += SystemMediaControls_PropertyChanged;
+        }
+
+        private async void DisplayInformation_OrientationChanged(DisplayInformation sender, object args)
+        {
+            _displayOrientation = sender.CurrentOrientation;
+
+            if (_isPreviewing)
+            {
+                await SetPreviewRotationAsync();
             }
         }
 
-#endregion
+        private async void SystemMediaControls_PropertyChanged(SystemMediaTransportControls sender, SystemMediaTransportControlsPropertyChangedEventArgs args)
+        {
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+            {
+                // Only handle this event if this page is currently being displayed
+                if (args.Property == SystemMediaTransportControlsProperty.SoundLevel && Frame.CurrentSourcePageType == typeof(MainPage))
+                {
+                    // Check to see if the app is being muted. If so, it is being minimized.
+                    // Otherwise if it is not initialized, it is being brought into focus.
+                    if (sender.SoundLevel == SoundLevel.Muted)
+                    {
+                        //await CleanupCameraAsync();
+                    }
+                    else if (!_isInitialized)
+                    {
+                        await InitializeCameraAsync();
+                    }
+                }
+            });
+        }
+
+        #endregion
 
         #region FaceAPI - Methods
         private async Task<Person> identifyFace(string path)
@@ -520,9 +683,76 @@ namespace IntelliMarketing
                     return faceRects.ToArray();
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return new FaceRectangle[0];
+            }
+        }
+
+        private async void Recognize(string path)
+        {
+            FaceRectangle[] faceRects = await UploadAndDetectFaces(path);
+            if (faceRects != null && faceRects.Count() > 0)
+            {
+                rectFace.Stroke = new SolidColorBrush(Colors.AliceBlue);
+                rectFace.Width = faceRects[0].Width / 2;
+                rectFace.Height = faceRects[0].Height / 2;
+                Canvas.SetLeft(rectFace, faceRects[0].Left / 2.2);
+                Canvas.SetTop(rectFace, faceRects[0].Top / 2.5);
+
+                //Drawing polygon
+                polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (faceRects[0].Width / 2) / 5, (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 30));
+                polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (((faceRects[0].Width / 2) / 5) * 4), (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 30));
+                polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (((faceRects[0].Width / 2) / 5) * 4), (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 0));
+                polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (faceRects[0].Width / 2) / 2 + 5, (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 0));
+                polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (faceRects[0].Width / 2) / 2, (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) + 7));
+                polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (faceRects[0].Width / 2) / 2 - 5, (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 0));
+                polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (faceRects[0].Width / 2) / 5, (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 0));
+
+
+                textAge.Margin = new Thickness(faceRects[0].Left / 2.2 + ((faceRects[0].Width / 2) / 5 * 2), (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 25, 0, 0);
+                textAge.Text = age;
+
+                try
+                {
+                    Person p = await identifyFace(path);
+                    textAge.Margin = new Thickness(faceRects[0].Left / 2.2 + ((faceRects[0].Width / 2) / 5 * 2), (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 25, 0, 0);
+                    textAge.Text = age;
+                    age_genre.Visibility = Visibility.Visible;
+                    polAge.Stroke = new SolidColorBrush(Colors.Black);
+                    if (gender == "male")
+                    {
+                        rectFace.Stroke = new SolidColorBrush(Colors.LightBlue);
+                        polAge.Fill = new SolidColorBrush(Colors.LightBlue);
+                    }
+                    else if (gender == "female")
+                    {
+                        rectFace.Stroke = new SolidColorBrush(Colors.LightPink);
+                        polAge.Fill = new SolidColorBrush(Colors.LightPink);
+                    }
+                    if (p != null)
+                    {
+                        pname = p.Name;
+                        setProduct(p.Name);
+                        ReadVoice(p.Name);
+                    }
+                    else
+                    {
+                        //msgBox.Text = "Face not recognize.";
+                        ReadVoice("error");
+                    }
+                }
+                catch (Exception e)
+                {
+                    //msgBox.Text = "Face not detected";
+                    ReadVoice("face");
+                }
+            }
+            else
+            {
+                //msgBox.Text = "Face not detected. Please take another photo.";
+                //myImage.Source = null;
+                ReadVoice("face");
             }
         }
 
@@ -624,84 +854,30 @@ namespace IntelliMarketing
         #region General Methods
         private async void captureElement()
         {
-            ImageEncodingProperties imgFormat = ImageEncodingProperties.CreateJpeg();
+            //ImageEncodingProperties imgFormat = ImageEncodingProperties.CreateJpeg();
 
-            StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync(
-                "TestPhoto.png",
-                CreationCollisionOption.GenerateUniqueName);
+            //StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync(
+            //    "Face.png",
+            //    CreationCollisionOption.ReplaceExisting);
 
-            // take photo
-            await mc.CapturePhotoToStorageFileAsync(imgFormat, file);
+            //// take photo
+            //await mc.CapturePhotoToStorageFileAsync(imgFormat, file);
 
-            // Get photo as a BitmapImage
-            BitmapImage bmpImage = new BitmapImage(new Uri(file.Path));
+            //// Get photo as a BitmapImage
+            //BitmapImage bmpImage = new BitmapImage(new Uri(file.Path));
+
+            var stream = new InMemoryRandomAccessStream();
+            await mc.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), stream);
+            var photoOrientation = ConvertOrientationToPhotoOrientation(GetCameraOrientation());
+            string c = await ReencodeAndSavePhotoAsync(stream, photoOrientation);
+
+            BitmapImage bmpImage2 = new BitmapImage(new Uri(c));
 
             // imagePreivew is a <Image> object defined in XAML
-            myImage.Source = bmpImage;
-            FaceRectangle[] faceRects = await UploadAndDetectFaces(file.Path);
-            if (faceRects != null && faceRects.Count() > 0)
-            {
-                rectFace.Stroke = new SolidColorBrush(Colors.AliceBlue);
-                rectFace.Width = faceRects[0].Width / 2;
-                rectFace.Height = faceRects[0].Height / 2;
-                Canvas.SetLeft(rectFace, faceRects[0].Left / 2.2);
-                Canvas.SetTop(rectFace, faceRects[0].Top / 2.5);
+            myImage.Source = bmpImage2;
 
-                //Drawing polygon
-                polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (faceRects[0].Width / 2) / 5, (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 30));
-                polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (((faceRects[0].Width / 2) / 5) * 4), (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 30));
-                polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (((faceRects[0].Width / 2) / 5) * 4), (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 0));
-                polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (faceRects[0].Width / 2) / 2 + 5, (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 0));
-                polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (faceRects[0].Width / 2) / 2, (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) + 7));
-                polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (faceRects[0].Width / 2) / 2 - 5, (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 0));
-                polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (faceRects[0].Width / 2) / 5, (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 0));
-
-
-                textAge.Margin = new Thickness(faceRects[0].Left / 2.2 + ((faceRects[0].Width / 2) / 5 * 2), (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 25, 0, 0);
-                textAge.Text = age;
-
-                try
-                {
-                    Person p = await identifyFace(file.Path);
-                    textAge.Margin = new Thickness(faceRects[0].Left / 2.2 + ((faceRects[0].Width / 2) / 5 * 2), (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 25, 0, 0);
-                    textAge.Text = age;
-                    age_genre.Visibility = Visibility.Visible;
-                    polAge.Stroke = new SolidColorBrush(Colors.Black);
-                    if (gender == "male")
-                    {
-                        rectFace.Stroke = new SolidColorBrush(Colors.LightBlue);
-                        polAge.Fill = new SolidColorBrush(Colors.LightBlue);
-                    }
-                    else if (gender == "female")
-                    {
-                        rectFace.Stroke = new SolidColorBrush(Colors.LightPink);
-                        polAge.Fill = new SolidColorBrush(Colors.LightPink);
-                    }
-                    if (p != null)
-                    {
-                        pname = p.Name;
-                        setProduct(p.Name);
-                        ReadVoice(p.Name);
-                    }
-                    else
-                    {
-                        //msgBox.Text = "Face not recognize.";
-                        ReadVoice("error");
-                    }
-                }
-                catch (Exception)
-                {
-                    //msgBox.Text = "Face not detected";
-                    ReadVoice("face");
-                }
-            }
-            else
-            {
-                //msgBox.Text = "Face not detected. Please take another photo.";
-                setProduct("Daibert");
-                myImage.Source = null;
-                ReadVoice("face");
-            }
+            //Recognize Someone
+            Recognize(c);
         }
 
         private void setProduct(string nome)
@@ -712,7 +888,7 @@ namespace IntelliMarketing
             switch (nome)
             {
                 case "Daibert":
-                    Page.Navigate(new Uri("http://www.chapeupanama.com.br/site/index.php?route=product/product&product_id=42"));
+                    Page.Navigate(new Uri("http://www.amazon.com/Sphero-R001USA-BB-8-App-Enabled-Droid/dp/B0107H5FJ6/ref=sr_1_1?ie=UTF8&qid=1442444059&sr=8-1&keywords=sphero+bb-8"));
                     //ProductImage.Source = "Images/bb8.jpg"
                     //product.UriSource = new Uri("bb8.jpg", UriKind.Relative);
                     //ProductImage.Source = product;
@@ -734,15 +910,23 @@ namespace IntelliMarketing
                     break;
             }
         }
-        
+
         private void Image_Tapped(object sender, TappedRoutedEventArgs e)
         {
             if (Page.Visibility == Visibility.Visible)
             {
+                age_genre.Text = "";
+                age_genre.Visibility = Visibility.Collapsed;
+                pname = "";
+                age = "";
+                gender = "";
+                polAge.Points.Clear();
+                myImage.Source = null;
                 Page.Visibility = Visibility.Collapsed;
             }
             else
             {
+                myImage.Source = null;
                 age_genre.Text = "";
                 age_genre.Visibility = Visibility.Collapsed;
                 pname = "";
@@ -753,6 +937,35 @@ namespace IntelliMarketing
             }
         }
 
+        private void HardwareButtons_CameraPressed(object sender, CameraEventArgs e)
+        {
+           captureElement();
+        }
+
+        #endregion
+
+        #region Encode Image
+        private static async Task<string> ReencodeAndSavePhotoAsync(IRandomAccessStream stream, PhotoOrientation photoOrientation)
+        {
+            //var file = await KnownFolders.PicturesLibrary.CreateFileAsync("FacePhoto.jpeg", CreationCollisionOption.ReplaceExisting);
+            StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync("Face.jpeg", CreationCollisionOption.GenerateUniqueName);
+            using (var inputStream = stream)
+            {
+                var decoder = await BitmapDecoder.CreateAsync(inputStream);
+
+                using (var outputStream = await file.OpenAsync(FileAccessMode.ReadWrite))
+                {
+                    var encoder = await BitmapEncoder.CreateForTranscodingAsync(outputStream, decoder);
+
+                    var properties = new BitmapPropertySet { { "System.Photo.Orientation", new BitmapTypedValue(photoOrientation, PropertyType.UInt16) } };
+
+                    await encoder.BitmapProperties.SetPropertiesAsync(properties);
+                    await encoder.FlushAsync();
+                }
+            }
+
+            return file.Path;
+        }
         #endregion
     }
 }
