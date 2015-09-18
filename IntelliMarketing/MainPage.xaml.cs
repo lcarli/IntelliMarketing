@@ -43,6 +43,8 @@ using Windows.Phone.UI.Input;
 using Windows.Networking.Connectivity;
 using Windows.UI.Popups;
 using IntelliMarketing.Common;
+using Windows.UI.Notifications;
+using Windows.Data.Xml.Dom;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -135,6 +137,7 @@ namespace IntelliMarketing
             this.navigationHelper.LoadState += navigationHelper_LoadState;
         }
 
+        #region Navigation Helper
         private void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
             if (e.NavigationParameter.ToString() == "takePhoto")
@@ -158,13 +161,15 @@ namespace IntelliMarketing
             get { return this.navigationHelper; }
         }
 
+        #endregion
+
         #region Cortana Method
         private void cortanaAction(string command)
         {
             if (command == "takePhoto")
             {
                 timer = new DispatcherTimer();
-                timer.Interval = new TimeSpan(0, 0, 0, 3, 0);
+                timer.Interval = new TimeSpan(0, 0, 0, 10, 0);
                 timer.Tick += Timer_Tick;
                 timer.Start();
             }
