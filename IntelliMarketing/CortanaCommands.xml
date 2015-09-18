@@ -8,7 +8,7 @@
       <Example> How old am I?  </Example>
       <ListenFor> [would] [you] [please] [tell] [me] How Old [am] [i] [please] </ListenFor>
       <Feedback> Discovering for you right now </Feedback>
-      <VoiceCommandService Target="VoiceCommandService"/>
+      <VoiceCommandService Target="IMCommandVoice"/>
     </Command>
     
     <Command Name="takePhoto">

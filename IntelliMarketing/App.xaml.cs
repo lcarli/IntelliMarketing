@@ -23,6 +23,7 @@ using Windows.ApplicationModel.VoiceCommands;
 using Windows.Media.SpeechRecognition;
 using Windows.Networking.Connectivity;
 using IntelliMarketing.Services.NavigationService;
+using System.Diagnostics;
 
 namespace IntelliMarketing
 {
@@ -59,7 +60,7 @@ namespace IntelliMarketing
             }
             catch (Exception exception)
             {
-
+                Debug.WriteLine(exception.Message);
             }
 
         }

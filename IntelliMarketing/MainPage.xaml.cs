@@ -757,6 +757,7 @@ namespace IntelliMarketing
             }
             catch (Exception e)
             {
+                Debug.WriteLine(e.Message);
                 return new FaceRectangle[0];
             }
         }
@@ -816,6 +817,7 @@ namespace IntelliMarketing
                 }
                 catch (Exception e)
                 {
+                    Debug.WriteLine(e.Message);
                     //msgBox.Text = "Face not detected";
                     ReadVoice(Error.No_Face);
                 }
