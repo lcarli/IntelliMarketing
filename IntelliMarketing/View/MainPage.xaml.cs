@@ -54,8 +54,9 @@ namespace IntelliMarketing
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        #region variables
         //Inicializate faceServiceCliente. Input faceAPI Key!!!
-        private readonly IFaceServiceClient faceServiceClient = new FaceServiceClient("cefde33b85354ecd9167d261c186dc19");
+        public static readonly IFaceServiceClient faceServiceClient = new FaceServiceClient("cefde33b85354ecd9167d261c186dc19");
 
         //Inicializate Camera
         MediaCapture mc;
@@ -83,7 +84,7 @@ namespace IntelliMarketing
         const string faceImageDir = @"C:\Users\Lucas\Pictures\Faces";
 
         //GroupID
-        string personGroupId = "mscm";
+        public static string personGroupId = "mscm";
 
         //Timer
         DispatcherTimer timer;
@@ -108,6 +109,9 @@ namespace IntelliMarketing
         //List faces (It's necessary 'cause directory doesn't works.
         private List<Face> listFaceID;
 
+        //Uri photo
+        string uriPhoto;
+        bool notRegister;
 
         //Create Enum of Errors
         enum Error
@@ -118,7 +122,7 @@ namespace IntelliMarketing
             Expensive
         };
 
-
+#endregion
 
 
         public MainPage()
@@ -143,6 +147,11 @@ namespace IntelliMarketing
             {
 
             }
+        }
+
+        private void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
+        {
+            throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
         }
 
         #endregion
@@ -794,6 +803,7 @@ namespace IntelliMarketing
                     else
                     {
                         //msgBox.Text = "Face not recognize.";
+                        notRegister = true;
                         ReadVoice(Error.Not_Recognized);
                     }
                 }
@@ -924,7 +934,7 @@ namespace IntelliMarketing
                 var stream = new InMemoryRandomAccessStream();
                 await mc.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), stream);
                 var photoOrientation = ConvertOrientationToPhotoOrientation(GetCameraOrientation());
-                string uriPhoto = await ReencodeAndSavePhotoAsync(stream, photoOrientation);
+                uriPhoto = await ReencodeAndSavePhotoAsync(stream, photoOrientation);
 
                 BitmapImage bmpImage = new BitmapImage(new Uri(uriPhoto));
 
@@ -1005,6 +1015,23 @@ namespace IntelliMarketing
             captureElement();
         }
 
+        private void myImage_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            notRegister = false;
+            #region Activation Code 
+            Frame rootFrame = Window.Current.Content as Frame;
+            if (rootFrame == null)
+            {
+                rootFrame = new Frame();
+                rootFrame.Language = Windows.Globalization.ApplicationLanguages.Languages[0];
+                rootFrame.NavigationFailed += OnNavigationFailed;
+                Window.Current.Content = rootFrame;
+            }
+            #endregion
+
+            rootFrame.Navigate(typeof(View.RegisterPage), uriPhoto);
+        }
+
         #endregion
 
         #region Encode Image
@@ -1030,5 +1057,7 @@ namespace IntelliMarketing
             return file.Path;
         }
         #endregion
+
+        
     }
 }

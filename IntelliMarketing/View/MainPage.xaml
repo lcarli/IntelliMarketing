@@ -107,7 +107,7 @@
                 <ColumnDefinition Width="1106"/>
                 <ColumnDefinition Width="2990"/>
             </Grid.ColumnDefinitions>
-            <Image Source="Assets/Logo/teched.jpg" Grid.Column="0" Grid.Row="0" Tapped="Image_Tapped" Stretch="None"/>
+            <Image Source="ms-appx:///Assets/Logo/teched.jpg" Grid.Column="0" Grid.Row="0" Tapped="Image_Tapped" Stretch="None"/>
             <Grid x:Name="LeftPanel"
                     Background="White"
                     Grid.Column="0" Grid.Row="1" Margin="50">
@@ -116,7 +116,7 @@
                     <RowDefinition Height="50*"/>
                 </Grid.RowDefinitions>
                 <Canvas x:Name="canvasImage" Grid.Row="0" Margin="50">
-                    <Image x:Name="myImage" Width="896" Height="629"/>
+                    <Image x:Name="myImage" Width="896" Height="629" Tapped="myImage_Tapped"/>
                     <Rectangle x:Name="rectFace" StrokeThickness="5" Stroke="Transparent" Visibility="Collapsed"/>
                     <Polygon x:Name="polAge" StrokeThickness="1" Visibility="Collapsed"/>
                     <TextBlock Foreground="Black" x:Name="textAge" Visibility="Collapsed"/>
