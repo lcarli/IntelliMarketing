@@ -10,6 +10,7 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Foundation.Metadata;
 using Windows.UI.Core;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -30,7 +31,7 @@ namespace IntelliMarketing.View
     {
         private List<Face> listFaceID;
         string uriPhoto;
-
+        
         public RegisterPage()
         {
             this.InitializeComponent();
@@ -76,7 +77,7 @@ namespace IntelliMarketing.View
         #region FaceAPI trainning
         private async Task listFaces(string path, string name)
         {
-            //foreach (string imagePath in Directory.GetFiles(faceImageDir, "*.*"))
+            //Caso queira adicionar mais fotos...
             //foreach (string imagePath in paths)
             //{
             using (Stream s = File.OpenRead(path))
@@ -102,7 +103,13 @@ namespace IntelliMarketing.View
                     trainingStatus = await MainPage.faceServiceClient.GetPersonGroupTrainingStatusAsync(MainPage.personGroupId);
                     if (trainingStatus.Status != "running")
                     {
+                        Registering.IsActive = false;
+                        username.IsEnabled = true;
+                        saveButton.IsEnabled = true;
                         Debug.WriteLine("Trainned");
+                        MessageDialog msg = new MessageDialog("Trainned");
+                        await msg.ShowAsync();
+                        Windows.UI.Core.SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
                         listFaceID.Clear();
                         break;
                     }
@@ -118,7 +125,19 @@ namespace IntelliMarketing.View
 
         private async void send_Click(object sender, RoutedEventArgs e)
         {
-            await listFaces(uriPhoto, username.Text);
+            if (App.ConnectedToInternet())
+            {
+                Windows.UI.Core.SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
+                Registering.IsActive = true;
+                saveButton.IsEnabled = false;
+                username.IsEnabled = false;
+                await listFaces(uriPhoto, username.Text);
+            }
+            else
+            {
+                MessageDialog msg = new MessageDialog("Sem conexão com a internet. Por favor, verifique sua conexão.");
+                await msg.ShowAsync();
+            }
         }
     }
 }
