@@ -115,13 +115,13 @@
                     <RowDefinition Height="50*"/>
                     <RowDefinition Height="50*"/>
                 </Grid.RowDefinitions>
-                <Canvas x:Name="canvasImage" Grid.Row="0" Margin="50">
-                    <Image x:Name="myImage" Width="896" Height="629" Tapped="myImage_Tapped"/>
+                <Canvas x:Name="canvasImage" Grid.Row="0" Grid.RowSpan="2" Visibility="Collapsed">
+                    <Image x:Name="myImage" Margin="50" Tapped="myImage_Tapped" Stretch="Uniform"/>
                     <Rectangle x:Name="rectFace" StrokeThickness="5" Stroke="Transparent" Visibility="Collapsed"/>
                     <Polygon x:Name="polAge" StrokeThickness="1" Visibility="Collapsed"/>
                     <TextBlock Foreground="Black" x:Name="textAge" Visibility="Collapsed"/>
                 </Canvas>
-                <CaptureElement x:Name="HoldCamera" Margin="50" Grid.Row="1"/>
+                <CaptureElement x:Name="HoldCamera" Margin="50" Grid.Row="0" Grid.RowSpan="2"/>
             </Grid>
             <WebView x:Name="Page" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Margin="50" Visibility="Collapsed"/>
             <TextBlock x:Name="age_genre" HorizontalAlignment="Center" TextWrapping="Wrap" VerticalAlignment="Bottom" Grid.Row="0" Height="97" Width="1106" FontSize="64" TextAlignment="Center" Visibility="Collapsed"/>

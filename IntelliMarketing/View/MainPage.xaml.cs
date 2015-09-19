@@ -58,6 +58,12 @@ namespace IntelliMarketing
         //Inicializate faceServiceCliente. Input faceAPI Key!!!
         public static readonly IFaceServiceClient faceServiceClient = new FaceServiceClient("cefde33b85354ecd9167d261c186dc19");
 
+        //MediaElement for Synth
+        MediaElement mediaElement;
+
+        //isCortana?
+        bool isCortana;
+
         //Inicializate Camera
         MediaCapture mc;
         private bool _isInitialized;
@@ -138,10 +144,17 @@ namespace IntelliMarketing
         #region Navigation Helper
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if (e.Parameter != null && e.Parameter is bool)
+            if (e.Parameter != null && e.Parameter is string)
             {
-                Debug.WriteLine(">>>>>>>>>>>>>CORTANA<<<<<<<<<<<<<<<<<");
-                cortanaAction("takePhoto");
+                if (e.Parameter.ToString() == "takePhoto")
+                {
+                    cortanaAction("takePhoto");
+                }
+                else if (e.Parameter.ToString() == "old")
+                {
+                    cortanaAction("old");
+                }
+                
             }
             else if (e.Parameter != null && e.Parameter is string && !string.IsNullOrWhiteSpace(e.Parameter as string))
             {
@@ -166,12 +179,25 @@ namespace IntelliMarketing
                 timer.Tick += Timer_Tick;
                 timer.Start();
             }
+            else if (command == "old")
+            {
+                timer = new DispatcherTimer();
+                timer.Interval = new TimeSpan(0, 0, 0, 7, 0);
+                timer.Tick += Timer_Tick_Old;
+                timer.Start();
+            }
         }
 
         private void Timer_Tick(object sender, object e)
         {
             timer.Stop();
             captureElement();
+        }
+
+        private void Timer_Tick_Old(object sender, object e)
+        {
+            timer.Stop();
+            captureElement_Old();
         }
 
         #endregion
@@ -201,21 +227,12 @@ namespace IntelliMarketing
                 MainGrid.RowDefinitions[0].Height = new GridLength(1106);
                 MainGrid.RowDefinitions[1].Height = new GridLength(2990);
 
-
                 Page.SetValue(Grid.ColumnProperty, 0);
                 Page.SetValue(Grid.RowProperty, 1);
                 Page.Margin = new Thickness(Width * 0.026);
 
-                myImage.Width = 2100;
-                myImage.Height = 1400;
-
                 age_genre.FontSize = 80;
                 age_genre.Foreground = new SolidColorBrush(Colors.White);
-
-                //Rotate();
-
-                //HoldCamera.Margin = new Thickness(Width * 0.06);
-                //LeftPanel.Margin = new Thickness(Width * 0.06);
             }
             else
             {
@@ -761,10 +778,10 @@ namespace IntelliMarketing
             if (faceRects != null && faceRects.Count() > 0)
             {
                 rectFace.Stroke = new SolidColorBrush(Colors.AliceBlue);
-                rectFace.Width = faceRects[0].Width / 2;
-                rectFace.Height = faceRects[0].Height / 2;
-                Canvas.SetLeft(rectFace, faceRects[0].Left / 2.2);
-                Canvas.SetTop(rectFace, faceRects[0].Top / 2.5);
+                rectFace.Width = faceRects[0].Width * 1.4;
+                rectFace.Height = faceRects[0].Height * 1.4;
+                Canvas.SetLeft(rectFace, faceRects[0].Left * 1.5);
+                Canvas.SetTop(rectFace, faceRects[0].Top * 4.1);
 
                 //Drawing polygon
                 polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (faceRects[0].Width / 2) / 5, (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 30));
@@ -775,13 +792,11 @@ namespace IntelliMarketing
                 polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (faceRects[0].Width / 2) / 2 - 5, (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 0));
                 polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (faceRects[0].Width / 2) / 5, (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 0));
 
-
                 textAge.Margin = new Thickness(faceRects[0].Left / 2.2 + ((faceRects[0].Width / 2) / 5 * 2), (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 25, 0, 0);
 
                 try
                 {
                     Person p = await identifyFace(path);
-                    textAge.Margin = new Thickness(faceRects[0].Left / 2.2 + ((faceRects[0].Width / 2) / 5 * 2), (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 25, 0, 0);
                     textAge.Text = age;
                     age_genre.Visibility = Visibility.Visible;
                     polAge.Stroke = new SolidColorBrush(Colors.Black);
@@ -823,13 +838,64 @@ namespace IntelliMarketing
             }
         }
 
+        private async void howOld(string path)
+        {
+            FaceRectangle[] faceRects = await UploadAndDetectFaces(path);
+            if (faceRects != null && faceRects.Count() > 0)
+            {
+                rectFace.Stroke = new SolidColorBrush(Colors.AliceBlue);
+                rectFace.Width = faceRects[0].Width / 2;
+                rectFace.Height = faceRects[0].Height / 2;
+                Canvas.SetLeft(rectFace, faceRects[0].Left / 2.2);
+                Canvas.SetTop(rectFace, faceRects[0].Top / 2.5);
+
+                //Drawing polygon
+                polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (faceRects[0].Width / 2) / 5, (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 30));
+                polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (((faceRects[0].Width / 2) / 5) * 4), (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 30));
+                polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (((faceRects[0].Width / 2) / 5) * 4), (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 0));
+                polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (faceRects[0].Width / 2) / 2 + 5, (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 0));
+                polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (faceRects[0].Width / 2) / 2, (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) + 7));
+                polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (faceRects[0].Width / 2) / 2 - 5, (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 0));
+                polAge.Points.Add(new Point(faceRects[0].Left / 2.2 + (faceRects[0].Width / 2) / 5, (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 0));
+
+
+                textAge.Margin = new Thickness(faceRects[0].Left / 2.2 + ((faceRects[0].Width / 2) / 5 * 2), (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 25, 0, 0);
+                try
+                {
+                    Person p = await identifyFace(path);
+                    textAge.Text = age;
+                    age_genre.Visibility = Visibility.Visible;
+                    polAge.Stroke = new SolidColorBrush(Colors.Black);
+                    if (gender == "male")
+                    {
+                        rectFace.Stroke = new SolidColorBrush(Colors.LightBlue);
+                        polAge.Fill = new SolidColorBrush(Colors.LightBlue);
+                    }
+                    else if (gender == "female")
+                    {
+                        rectFace.Stroke = new SolidColorBrush(Colors.LightPink);
+                        polAge.Fill = new SolidColorBrush(Colors.LightPink);
+                    }
+                    readAge(age, gender);
+                }
+                catch (Exception e)
+                {
+                    ReadVoice(Error.No_Face);
+                }
+            }
+            else
+            {
+                ReadVoice(Error.No_Face);
+            }
+        }
+
         #endregion
 
         #region Voice Synth
         private async void ReadVoice(Error name)
         {
             // The media object for controlling and playing audio.
-            MediaElement mediaElement = new MediaElement();
+            mediaElement = new MediaElement();
 
             // The object for controlling the speech synthesis engine (voice).
             var synth = new Windows.Media.SpeechSynthesis.SpeechSynthesizer();
@@ -862,13 +928,52 @@ namespace IntelliMarketing
         private async void ReadVoiceName(string name)
         {
             // The media object for controlling and playing audio.
-            MediaElement mediaElement = new MediaElement();
+            mediaElement = new MediaElement();
 
             // The object for controlling the speech synthesis engine (voice).
             var synth = new Windows.Media.SpeechSynthesis.SpeechSynthesizer();
 
             // Generate the audio stream from plain text.
             SpeechSynthesisStream stream = await synth.SynthesizeTextToStreamAsync("Hello " + name + "! Let me check some products for you.");
+
+            // Send the stream to the media object.
+            mediaElement.SetSource(stream, stream.ContentType);
+            mediaElement.Play();
+        }
+
+        private async void readAge(string age, string gender)
+        {
+            // The media object for controlling and playing audio.
+            mediaElement = new MediaElement();
+
+            // The object for controlling the speech synthesis engine (voice).
+            var synth = new Windows.Media.SpeechSynthesis.SpeechSynthesizer();
+
+            string adjetivo, faixaEtaria;
+            if (gender == "male")
+            {
+                adjetivo = "sir";
+            }
+            else
+            {
+                adjetivo = "miss";
+            }
+
+            if (Int16.Parse(age) < 25)
+            {
+                faixaEtaria = "a young person";
+            }
+            else if (Int16.Parse(age) > 50)
+            {
+                faixaEtaria = "a growth " + gender;
+            }
+            else
+            {
+                faixaEtaria = "";
+            }
+
+            // Generate the audio stream from plain text.
+            SpeechSynthesisStream stream = await synth.SynthesizeTextToStreamAsync("Hello " + adjetivo + "! Today you're looking " + faixaEtaria + " with " + age + " years old." );
 
             // Send the stream to the media object.
             mediaElement.SetSource(stream, stream.ContentType);
@@ -911,7 +1016,7 @@ namespace IntelliMarketing
                 if (speechRecognizerContinuous == null)
                 {
                     speechRecognizerContinuous = new SpeechRecognizer();
-                    speechRecognizerContinuous.Constraints.Add(new SpeechRecognitionListConstraint(new List<String>() { "Take a Picture" }, "start"));
+                    speechRecognizerContinuous.Constraints.Add(new SpeechRecognitionListConstraint(new List<String>() { "Take a Picture", "Reset", "How Old" }, "start"));
                     SpeechRecognitionCompilationResult contCompilationResult = await speechRecognizerContinuous.CompileConstraintsAsync();
 
                     if (contCompilationResult.Status != SpeechRecognitionResultStatus.Success)
@@ -934,12 +1039,28 @@ namespace IntelliMarketing
         {
             if (args.Result.Confidence == SpeechRecognitionConfidence.Medium || args.Result.Confidence == SpeechRecognitionConfidence.High)
             {
-                if (args.Result.Text == "Take a Picture")
+                switch (args.Result.Text)
                 {
-                    await Media.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                     {
-                         captureElement();
-                     });
+                    case "Take a Picture":
+                        await Media.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                        {
+                            captureElement();
+                        });
+                        break;
+                    case "Reset":
+                        await Media.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                        {
+                            resetSetup();
+                        });
+                        break;
+                    case "How Old":
+                        await Media.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                        {
+                            captureElement_Old();
+                        });
+                        break;
+                    default:
+                        break;
                 }
             }
 
@@ -966,6 +1087,9 @@ namespace IntelliMarketing
         #region General Methods
         public async void captureElement()
         {
+            myImage.Height = HoldCamera.ActualHeight;
+            myImage.Width = HoldCamera.ActualWidth;
+
             if (App.ConnectedToInternet())
             {
                 var stream = new InMemoryRandomAccessStream();
@@ -978,8 +1102,42 @@ namespace IntelliMarketing
                 // imagePreivew is a <Image> object defined in XAML
                 myImage.Source = bmpImage;
 
+                //Show Picture
+                HoldCamera.Visibility = Visibility.Collapsed;
+                canvasImage.Visibility = Visibility.Visible;
+
                 //Recognize Someone
                 Recognize(uriPhoto);
+            }
+            else
+            {
+                MessageDialog msg = new MessageDialog("No internet is avaiable. Please, check your connection.");
+                await msg.ShowAsync();
+            }
+        }
+
+        public async void captureElement_Old()
+        {
+            myImage.Height = HoldCamera.ActualHeight;
+            myImage.Width = HoldCamera.ActualWidth;
+            if (App.ConnectedToInternet())
+            {
+                var stream = new InMemoryRandomAccessStream();
+                await mc.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), stream);
+                var photoOrientation = ConvertOrientationToPhotoOrientation(GetCameraOrientation());
+                uriPhoto = await ReencodeAndSavePhotoAsync(stream, photoOrientation);
+
+                BitmapImage bmpImage = new BitmapImage(new Uri(uriPhoto));
+
+                // imagePreivew is a <Image> object defined in XAML
+                myImage.Source = bmpImage;
+
+                //Show Picture
+                HoldCamera.Visibility = Visibility.Collapsed;
+                canvasImage.Visibility = Visibility.Visible;
+
+                //Recognize Someone
+                howOld(uriPhoto);
             }
             else
             {
@@ -1023,16 +1181,9 @@ namespace IntelliMarketing
         private void Image_Tapped(object sender, TappedRoutedEventArgs e)
         {
             //Verify if product was showed and reset setup.
-            if (Page.Visibility == Visibility.Visible)
+            if (canvasImage.Visibility == Visibility.Visible)
             {
-                age_genre.Text = "";
-                age_genre.Visibility = Visibility.Collapsed;
-                pname = "";
-                age = "";
-                gender = "";
-                polAge.Points.Clear();
-                myImage.Source = null;
-                Page.Visibility = Visibility.Collapsed;
+                resetSetup();
             }
             else
             {
@@ -1045,6 +1196,21 @@ namespace IntelliMarketing
                 polAge.Points.Clear();
                 captureElement();
             }
+        }
+
+        private void resetSetup()
+        {
+            mediaElement.Stop();
+            canvasImage.Visibility = Visibility.Collapsed;
+            HoldCamera.Visibility = Visibility.Visible;
+            age_genre.Text = "";
+            age_genre.Visibility = Visibility.Collapsed;
+            pname = "";
+            age = "";
+            gender = "";
+            polAge.Points.Clear();
+            myImage.Source = null;
+            Page.Visibility = Visibility.Collapsed;
         }
 
         private void HardwareButtons_CameraPressed(object sender, CameraEventArgs e)

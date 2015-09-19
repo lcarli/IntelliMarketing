@@ -201,7 +201,10 @@ namespace IntelliMarketing
                 switch (voiceCommandName)
                 {
                     case "takePhoto":
-                        rootFrame.Navigate(typeof(MainPage), true);
+                        rootFrame.Navigate(typeof(MainPage), "takePhoto");
+                        break;
+                    case "old":
+                        rootFrame.Navigate(typeof(MainPage), "old");
                         break;
                     default:
                         rootFrame.Navigate(typeof(MainPage));
