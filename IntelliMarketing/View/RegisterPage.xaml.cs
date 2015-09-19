@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Foundation.Metadata;
+using Windows.Phone.UI.Input;
 using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
@@ -31,37 +32,55 @@ namespace IntelliMarketing.View
     {
         private List<Face> listFaceID;
         string uriPhoto;
-        
+
         public RegisterPage()
         {
             this.InitializeComponent();
+
+            if (MainPage.deviceFamily == "Mobile")
+            {
+                tip.Visibility = Visibility.Collapsed;
+                UserPic.SetValue(Grid.RowProperty, 1);
+                Rpainel.SetValue(Grid.ColumnProperty, 0);
+                Rpainel.SetValue(Grid.RowProperty, 1);
+                //username.SetValue(RelativePanel.RightOfProperty, "");
+                //username.SetValue(RelativePanel.AboveProperty, "txtname");
+            }
 
             listFaceID = new List<Face>();
 
             Windows.UI.Core.SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
             Windows.UI.Core.SystemNavigationManager.GetForCurrentView().BackRequested += (s, a) =>
             {
-                if (ApiInformation.IsApiContractPresent("Windows.Phone.PhoneContract", 1, 0))
+                if (Frame.CanGoBack)
                 {
-                    Windows.Phone.UI.Input.HardwareButtons.BackPressed += (sa, aa) =>
-                    {
-                        if (Frame.CanGoBack)
-                        {
-                            Frame.GoBack();
-                            a.Handled = true;
-                        }
-                    };
-                }
-                else
-                {
-                    if (Frame.CanGoBack)
-                    {
-                        Frame.GoBack();
-                        a.Handled = true;
-                    }
+                    Frame.GoBack();
+                    a.Handled = true;
                 }
 
             };
+
+            if (Windows.Foundation.Metadata.ApiInformation.IsTypePresent("Windows.Phone.UI.Input.HardwareButtons"))
+            {
+                //Also use hardware back button
+                Windows.Phone.UI.Input.HardwareButtons.BackPressed += (r, e) =>
+                {
+                    if (Frame.CanGoBack)
+                    {
+                        e.Handled = true;
+                        Frame.GoBack();
+                    }
+                };
+            }
+        }
+
+        private void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
+        {
+            if (Frame.CanGoBack)
+            {
+                Frame.GoBack();
+                e.Handled = true;
+            }
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -125,19 +144,19 @@ namespace IntelliMarketing.View
 
         private async void send_Click(object sender, RoutedEventArgs e)
         {
-            if (App.ConnectedToInternet())
-            {
-                Windows.UI.Core.SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
-                Registering.IsActive = true;
-                saveButton.IsEnabled = false;
-                username.IsEnabled = false;
-                await listFaces(uriPhoto, username.Text);
-            }
-            else
-            {
-                MessageDialog msg = new MessageDialog("Sem conexão com a internet. Por favor, verifique sua conexão.");
-                await msg.ShowAsync();
-            }
+            //if (App.ConnectedToInternet())
+            //{
+            //    Windows.UI.Core.SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
+            //    Registering.IsActive = true;
+            //    saveButton.IsEnabled = false;
+            //    username.IsEnabled = false;
+            //    await listFaces(uriPhoto, username.Text);
+            //}
+            //else
+            //{
+            //    MessageDialog msg = new MessageDialog("Sem conexão com a internet. Por favor, verifique sua conexão.");
+            //    await msg.ShowAsync();
+            //}
         }
     }
 }

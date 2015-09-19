@@ -93,7 +93,7 @@ namespace IntelliMarketing
         int contagem;
 
         //DeviceFamily
-        string deviceFamily;
+        public static string deviceFamily;
 
         //Person name
         string pname;
@@ -1017,19 +1017,22 @@ namespace IntelliMarketing
 
         private void myImage_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            notRegister = false;
-            #region Activation Code 
-            Frame rootFrame = Window.Current.Content as Frame;
-            if (rootFrame == null)
+            if (notRegister)
             {
-                rootFrame = new Frame();
-                rootFrame.Language = Windows.Globalization.ApplicationLanguages.Languages[0];
-                rootFrame.NavigationFailed += OnNavigationFailed;
-                Window.Current.Content = rootFrame;
-            }
-            #endregion
+                notRegister = false;
+                #region Activation Code 
+                Frame rootFrame = Window.Current.Content as Frame;
+                if (rootFrame == null)
+                {
+                    rootFrame = new Frame();
+                    rootFrame.Language = Windows.Globalization.ApplicationLanguages.Languages[0];
+                    rootFrame.NavigationFailed += OnNavigationFailed;
+                    Window.Current.Content = rootFrame;
+                }
+                #endregion
 
-            rootFrame.Navigate(typeof(View.RegisterPage), uriPhoto);
+                rootFrame.Navigate(typeof(View.RegisterPage), uriPhoto);
+            }
         }
 
         #endregion
@@ -1057,7 +1060,5 @@ namespace IntelliMarketing
             return file.Path;
         }
         #endregion
-
-        
     }
 }

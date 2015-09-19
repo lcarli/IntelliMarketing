@@ -24,9 +24,15 @@
                 <RowDefinition Height="1577"/>
             </Grid.RowDefinitions>
             <Image Source="ms-appx:///Assets/Logo/teched.jpg" Grid.Column="0" Grid.Row="0" Stretch="None"/>
-            <Image x:Name="UserPic" Grid.Column="0" Grid.Row="1" Stretch="None" Margin="200"/>
-            <TextBlock Grid.Column="1" Grid.Row="0" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="80" TextWrapping="Wrap" Text="Você gostaria de tirar mais fotos? Saiba que quanto mais fotos você tirar, mas preciso será o reconhecimento. Mas sou bem inteligente. Bastam duas fotos!"/>
-            <RelativePanel Grid.Column="1" Grid.Row="1">
+            <Grid Grid.Column="0" Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="400"/>
+                    <RowDefinition Height="1177"/>
+                </Grid.RowDefinitions>
+                <Image x:Name="UserPic" Grid.Row="0" Grid.RowSpan="2" Stretch="None" Margin="200"/>
+            </Grid>
+            <TextBlock x:Name="tip" Grid.Column="1" Grid.Row="0" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="80" TextWrapping="Wrap" Text="Você gostaria de tirar mais fotos? Saiba que quanto mais fotos você tirar, mas preciso será o reconhecimento. Mas sou bem inteligente. Bastam duas fotos!"/>
+            <RelativePanel x:Name="Rpainel" Grid.Column="1" Grid.Row="1">
                 <TextBlock FontSize="80" Foreground="White" x:Name="txtname" Text="Digite seu nome:   " RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignTopWithPanel="True" Margin="120,0,0,0"/>
                 <TextBox x:Name="username" Width="800" Height="100" RelativePanel.RightOf="txtname" Margin="15" Text="" FontSize="80"/>
                 <!--<Button x:Name="send" Content="Salvar" RelativePanel.AlignBottomWithPanel="True" RelativePanel.AlignLeftWithPanel="True" Click="send_Click" Background="#33D0D0D0" Width="300" Height="300" FontSize="80"/>-->
