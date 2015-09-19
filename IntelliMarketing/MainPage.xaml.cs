@@ -171,11 +171,6 @@ namespace IntelliMarketing
 
         private async void ajustes()
         {
-            if (Windows.Foundation.Metadata.ApiInformation.IsTypePresent("Windows.UI.ViewManagement.StatusBar"))
-            {
-                await Windows.UI.ViewManagement.StatusBar.GetForCurrentView().HideAsync();
-            }
-
             var qualifiers = Windows.ApplicationModel.Resources.Core.ResourceContext.GetForCurrentView().QualifierValues;
             deviceFamily = qualifiers["DeviceFamily"];
 
@@ -197,7 +192,6 @@ namespace IntelliMarketing
                 MainGrid.RowDefinitions[0].Height = new GridLength(1106);
                 MainGrid.RowDefinitions[1].Height = new GridLength(2990);
 
-                MainGrid.ColumnDefinitions[1].Width = new GridLength(0);
 
                 Page.SetValue(Grid.ColumnProperty, 0);
                 Page.SetValue(Grid.RowProperty, 1);
@@ -205,6 +199,9 @@ namespace IntelliMarketing
 
                 myImage.Width = 2100;
                 myImage.Height = 1400;
+
+                age_genre.FontSize = 80;
+                age_genre.Foreground = new SolidColorBrush(Colors.White);
 
                 //Rotate();
 
@@ -750,7 +747,6 @@ namespace IntelliMarketing
 
         private async void Recognize(string path)
         {
-            Debug.WriteLine(">>>>>>>>>>>>>RECOGNIZE<<<<<<<<<<<<<<<<<");
             FaceRectangle[] faceRects = await UploadAndDetectFaces(path);
             if (faceRects != null && faceRects.Count() > 0)
             {
@@ -920,25 +916,10 @@ namespace IntelliMarketing
 
         #endregion
 
-        #region Verify Connection
-        private bool ConnectedToInternet()
-        {
-            ConnectionProfile InternetConnectionProfile = NetworkInformation.GetInternetConnectionProfile();
-
-            if (InternetConnectionProfile == null)
-            {
-                return false;
-            }
-
-            var level = InternetConnectionProfile.GetNetworkConnectivityLevel();
-            return level == NetworkConnectivityLevel.InternetAccess;
-        }
-        #endregion
-
         #region General Methods
         public async void captureElement()
         {
-            if (ConnectedToInternet())
+            if (App.ConnectedToInternet())
             {
                 var stream = new InMemoryRandomAccessStream();
                 await mc.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), stream);

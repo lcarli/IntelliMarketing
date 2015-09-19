@@ -3,7 +3,7 @@
   <Identity Name="56940Lcarli.DemoPushLucas1" Publisher="CN=8C3856B6-F236-490F-8FF8-E911B3BC3B57" Version="1.1.0.0" />
   <mp:PhoneIdentity PhoneProductId="b48bb48e-1f60-48ae-b2eb-32b3c45f98b4" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>DemoPushLucas1</DisplayName>
+    <DisplayName>DemoFaceAPI</DisplayName>
     <PublisherDisplayName>Lcarli</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -15,7 +15,7 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="IntelliMarketing.App">
-      <uap:VisualElements DisplayName="DemoPushLucas1" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="IntelliMarketing" BackgroundColor="#6D297A">
+      <uap:VisualElements DisplayName="DemoFaceAPI" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="IntelliMarketing" BackgroundColor="#6D297A">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square310x310Logo="Assets\Square310x310Logo.png" Square71x71Logo="Assets\Square71x71Logo.png">
           <uap:ShowNameOnTiles>
             <uap:ShowOn Tile="square310x310Logo" />

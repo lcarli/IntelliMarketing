@@ -51,9 +51,9 @@ namespace IntelliMarketing
 
         private async Task InitNotificationsAsync()
         {
-            var channel = await PushNotificationChannelManager.CreatePushNotificationChannelForApplicationAsync();
             try
             {
+                var channel = await PushNotificationChannelManager.CreatePushNotificationChannelForApplicationAsync();
                 await App.MobileService.GetPush().RegisterNativeAsync(channel.Uri);
             }
             catch (Exception exception)
@@ -76,7 +76,10 @@ namespace IntelliMarketing
         /// <param name="e">Details about the launch request and process.</param>
         protected async override void OnLaunched(LaunchActivatedEventArgs e)
         {
-
+            if (Windows.Foundation.Metadata.ApiInformation.IsTypePresent("Windows.UI.ViewManagement.StatusBar"))
+            {
+                await Windows.UI.ViewManagement.StatusBar.GetForCurrentView().HideAsync();
+            }
             try
             {
                 StorageFile vcdStorageFile = await Package.Current.InstalledLocation.GetFileAsync(@"CortanaCommands.xml");
@@ -158,7 +161,7 @@ namespace IntelliMarketing
             deferral.Complete();
         }
 
-        private bool ConnectedToInternet()
+        public static bool ConnectedToInternet()
         {
             ConnectionProfile InternetConnectionProfile = NetworkInformation.GetInternetConnectionProfile();
 
