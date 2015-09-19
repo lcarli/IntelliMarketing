@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     <Viewbox>
-        <Grid x:Name="MainGrid" Background="#9DD9DD" >
+        <Grid x:Name="MainGrid" Background="#6D297A" >
             <!--<VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="VisualStateGroup">
                 <VisualState x:Name="VisualStateFullHD">
@@ -107,7 +107,7 @@
                 <ColumnDefinition Width="1106"/>
                 <ColumnDefinition Width="2990"/>
             </Grid.ColumnDefinitions>
-            <Image Source="Assets/Logo/logo.png" Grid.Column="0" Grid.Row="0" Tapped="Image_Tapped"/>
+            <Image Source="Assets/Logo/teched.jpg" Grid.Column="0" Grid.Row="0" Tapped="Image_Tapped" Stretch="None"/>
             <Grid x:Name="LeftPanel"
                     Background="White"
                     Grid.Column="0" Grid.Row="1" Margin="50">
