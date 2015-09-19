@@ -67,6 +67,7 @@ namespace IntelliMarketing.View
                 {
                     if (Frame.CanGoBack)
                     {
+                        Registering.IsActive = false;
                         e.Handled = true;
                         Frame.GoBack();
                     }
@@ -144,19 +145,28 @@ namespace IntelliMarketing.View
 
         private async void send_Click(object sender, RoutedEventArgs e)
         {
-            //if (App.ConnectedToInternet())
-            //{
-            //    Windows.UI.Core.SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
-            //    Registering.IsActive = true;
-            //    saveButton.IsEnabled = false;
-            //    username.IsEnabled = false;
-            //    await listFaces(uriPhoto, username.Text);
-            //}
-            //else
-            //{
-            //    MessageDialog msg = new MessageDialog("Sem conexão com a internet. Por favor, verifique sua conexão.");
-            //    await msg.ShowAsync();
-            //}
+            if (username.Text.Length > 0)
+            {
+                if (App.ConnectedToInternet())
+                {
+                    //Windows.UI.Core.SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
+                    //Registering.IsActive = true;
+                    //UserPic.Visibility = Visibility.Collapsed;
+                    //saveButton.IsEnabled = false;
+                    //username.IsEnabled = false;
+                    //await listFaces(uriPhoto, username.Text);
+                }
+                else
+                {
+                    MessageDialog msg = new MessageDialog("Sem conexão com a internet. Por favor, verifique sua conexão.");
+                    await msg.ShowAsync();
+                }
+            }
+            else
+            {
+                MessageDialog msg = new MessageDialog("Por favor digite um nome para o usuário.");
+                await msg.ShowAsync();
+            }
         }
     }
 }

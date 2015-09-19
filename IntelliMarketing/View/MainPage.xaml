@@ -125,6 +125,7 @@
             </Grid>
             <WebView x:Name="Page" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Margin="50" Visibility="Collapsed"/>
             <TextBlock x:Name="age_genre" HorizontalAlignment="Center" TextWrapping="Wrap" VerticalAlignment="Bottom" Grid.Row="0" Height="97" Width="1106" FontSize="64" TextAlignment="Center" Visibility="Collapsed"/>
+            <MediaElement x:Name="Media"></MediaElement>
             <!--<Grid x:Name="Content" Background="White" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Margin="50">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="80*"/>

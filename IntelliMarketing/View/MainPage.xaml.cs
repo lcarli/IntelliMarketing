@@ -104,7 +104,8 @@ namespace IntelliMarketing
         string gender;
 
         //SpeechRecognizer Object
-        SpeechRecognizer voiceRecognizer;
+        private SpeechRecognizer voiceRecognizer;
+        private SpeechRecognizer speechRecognizerContinuous;
 
         //List faces (It's necessary 'cause directory doesn't works.
         private List<Face> listFaceID;
@@ -122,7 +123,7 @@ namespace IntelliMarketing
             Expensive
         };
 
-#endregion
+        #endregion
 
 
         public MainPage()
@@ -130,7 +131,6 @@ namespace IntelliMarketing
             Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
             this.InitializeComponent();
             listFaceID = new List<Face>();
-            //createListFaceID();
             inicializar();
             ajustes();
         }
@@ -162,7 +162,7 @@ namespace IntelliMarketing
             if (command == "takePhoto")
             {
                 timer = new DispatcherTimer();
-                timer.Interval = new TimeSpan(0, 0, 0, 10, 0);
+                timer.Interval = new TimeSpan(0, 0, 0, 7, 0);
                 timer.Tick += Timer_Tick;
                 timer.Start();
             }
@@ -244,6 +244,7 @@ namespace IntelliMarketing
             }
 
             RegisterEventHandlers();
+            await InitContiniousRecognition();
         }
 
         private async void inicializar()
@@ -847,7 +848,7 @@ namespace IntelliMarketing
                     stream = await synth.SynthesizeTextToStreamAsync("I can't find another product for you.");
                     break;
                 case Error.Expensive:
-                    stream = await synth.SynthesizeTextToStreamAsync("You need to order Danilo to raise your paycheck. Let me check another product for you, for now.");
+                    stream = await synth.SynthesizeTextToStreamAsync("You need to order your boss to raise your paycheck. Let me check another product for you, for now.");
                     break;
                 default:
                     stream = await synth.SynthesizeTextToStreamAsync("Hello " + name + "! Let me check some products for you.");
@@ -903,9 +904,45 @@ namespace IntelliMarketing
             }
         }
 
-        private void ContinuousRecognitionSession_ResultGenerated(SpeechContinuousRecognitionSession sender, SpeechContinuousRecognitionResultGeneratedEventArgs args)
+        private async Task InitContiniousRecognition()
         {
-            //InputText(args.Result.Text);
+            try
+            {
+                if (speechRecognizerContinuous == null)
+                {
+                    speechRecognizerContinuous = new SpeechRecognizer();
+                    speechRecognizerContinuous.Constraints.Add(new SpeechRecognitionListConstraint(new List<String>() { "Take a Picture" }, "start"));
+                    SpeechRecognitionCompilationResult contCompilationResult = await speechRecognizerContinuous.CompileConstraintsAsync();
+
+                    if (contCompilationResult.Status != SpeechRecognitionResultStatus.Success)
+                    {
+                        throw new Exception();
+                    }
+                    speechRecognizerContinuous.ContinuousRecognitionSession.ResultGenerated += ContinuousRecognitionSession_ResultGenerated;
+                }
+
+                await speechRecognizerContinuous.ContinuousRecognitionSession.StartAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+        }
+
+
+        private async void ContinuousRecognitionSession_ResultGenerated(SpeechContinuousRecognitionSession sender, SpeechContinuousRecognitionResultGeneratedEventArgs args)
+        {
+            if (args.Result.Confidence == SpeechRecognitionConfidence.Medium || args.Result.Confidence == SpeechRecognitionConfidence.High)
+            {
+                if (args.Result.Text == "Take a Picture")
+                {
+                    await Media.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                     {
+                         captureElement();
+                     });
+                }
+            }
+
         }
 
         private void ContinuousRecognitionSession_Completed(SpeechContinuousRecognitionSession sender, SpeechContinuousRecognitionCompletedEventArgs args)

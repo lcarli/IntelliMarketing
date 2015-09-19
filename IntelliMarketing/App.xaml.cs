@@ -1,4 +1,4 @@
-﻿using Microsoft.WindowsAzure.MobileServices;
+﻿//using Microsoft.WindowsAzure.MobileServices;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,6 +23,7 @@ using Windows.ApplicationModel.VoiceCommands;
 using Windows.Media.SpeechRecognition;
 using Windows.Networking.Connectivity;
 using System.Diagnostics;
+using Microsoft.WindowsAzure.MobileServices;
 
 namespace IntelliMarketing
 {

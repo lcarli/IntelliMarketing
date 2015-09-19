@@ -37,9 +37,9 @@
                 <TextBox x:Name="username" Width="800" Height="100" RelativePanel.RightOf="txtname" Margin="15" Text="" FontSize="80"/>
                 <!--<Button x:Name="send" Content="Salvar" RelativePanel.AlignBottomWithPanel="True" RelativePanel.AlignLeftWithPanel="True" Click="send_Click" Background="#33D0D0D0" Width="300" Height="300" FontSize="80"/>-->
             </RelativePanel>
-            <ProgressRing x:Name="Registering" VerticalAlignment="Center" HorizontalAlignment="Center"  IsActive="False" Foreground="White" Grid.Column="0" Grid.Row="1">
+            <ProgressRing x:Name="Registering" VerticalAlignment="Center" HorizontalAlignment="Center"  IsActive="False" Foreground="Black" Grid.Column="0" Grid.Row="1">
                 <ProgressRing.RenderTransform>
-                    <CompositeTransform ScaleX="3" ScaleY="3" CenterX="20"></CompositeTransform>
+                    <CompositeTransform ScaleX="9" ScaleY="9" CenterX="20"></CompositeTransform>
                 </ProgressRing.RenderTransform>
             </ProgressRing>
         </Grid>
