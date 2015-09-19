@@ -42,7 +42,6 @@ using Windows.Foundation.Metadata;
 using Windows.Phone.UI.Input;
 using Windows.Networking.Connectivity;
 using Windows.UI.Popups;
-using IntelliMarketing.Common;
 using Windows.UI.Notifications;
 using Windows.Data.Xml.Dom;
 
@@ -89,9 +88,6 @@ namespace IntelliMarketing
         //Timer
         DispatcherTimer timer;
 
-        //NavigationHelper
-        private NavigationHelper navigationHelper;
-
         //Contador
         int contagem;
 
@@ -133,32 +129,20 @@ namespace IntelliMarketing
             //createListFaceID();
             inicializar();
             ajustes();
-            this.navigationHelper = new NavigationHelper(this);
-            this.navigationHelper.LoadState += navigationHelper_LoadState;
         }
 
         #region Navigation Helper
-        private void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
-        {
-            if (e.NavigationParameter.ToString() == "takePhoto")
-            {
-                cortanaAction(e.NavigationParameter.ToString());
-            }
-        }
-
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            navigationHelper.OnNavigatedTo(e);
-        }
+            if (e.Parameter != null && e.Parameter is bool)
+            {
+                Debug.WriteLine(">>>>>>>>>>>>>CORTANA<<<<<<<<<<<<<<<<<");
+                cortanaAction("takePhoto");
+            }
+            else if (e.Parameter != null && e.Parameter is string && !string.IsNullOrWhiteSpace(e.Parameter as string))
+            {
 
-        protected override void OnNavigatedFrom(NavigationEventArgs e)
-        {
-            navigationHelper.OnNavigatedFrom(e);
-        }
-
-        public NavigationHelper NavigationHelper
-        {
-            get { return this.navigationHelper; }
+            }
         }
 
         #endregion
@@ -177,6 +161,7 @@ namespace IntelliMarketing
 
         private void Timer_Tick(object sender, object e)
         {
+            timer.Stop();
             captureElement();
         }
 
@@ -740,6 +725,7 @@ namespace IntelliMarketing
 
         private async Task<FaceRectangle[]> UploadAndDetectFaces(string imageFilePath)
         {
+
             try
             {
                 using (Stream imageFileStream = File.OpenRead(imageFilePath))
@@ -764,6 +750,7 @@ namespace IntelliMarketing
 
         private async void Recognize(string path)
         {
+            Debug.WriteLine(">>>>>>>>>>>>>RECOGNIZE<<<<<<<<<<<<<<<<<");
             FaceRectangle[] faceRects = await UploadAndDetectFaces(path);
             if (faceRects != null && faceRects.Count() > 0)
             {
@@ -784,7 +771,6 @@ namespace IntelliMarketing
 
 
                 textAge.Margin = new Thickness(faceRects[0].Left / 2.2 + ((faceRects[0].Width / 2) / 5 * 2), (faceRects[0].Top / 2.5 - (faceRects[0].Width / 2) / 5) - 25, 0, 0);
-                textAge.Text = age;
 
                 try
                 {
