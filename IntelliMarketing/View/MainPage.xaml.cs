@@ -482,30 +482,6 @@ namespace IntelliMarketing
 
         #endregion
 
-        #region Extra Methods
-        private async void AnalyzeReaction()
-        {
-            ImageEncodingProperties imgFormat = ImageEncodingProperties.CreateJpeg();
-            StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync("ReactionPhoto.png", CreationCollisionOption.GenerateUniqueName);
-            // take photo
-            await mc.CapturePhotoToStorageFileAsync(imgFormat, file);
-            //Analyse person
-            try
-            {
-                Person p = await identifyFace(file.Path);
-                if (p.Name == pname)
-                {
-
-                }
-            }
-            catch (Exception)
-            {
-                //msgBox.Text = "Face not detected";
-                ReadVoice(Error.No_Face);
-            }
-        }
-        #endregion
-
         #region PageNavigation Methods
         private void Page_NavigationCompleted(WebView sender, WebViewNavigationCompletedEventArgs args)
         {
