@@ -6,7 +6,7 @@
 
     <Command Name="old">
       <Example> How old am I?  </Example>
-      <ListenFor> [would] [you] [please] [tell] [me] How Old [am] [i] [please] [look] [like] [today] </ListenFor>
+      <ListenFor> [would] [you] [please] [tell] [me] How Old [do] [am] [i] [please] [look] [like] [today] </ListenFor>
       <Feedback> Discovering for you right now </Feedback>
       <Navigate/>
     </Command>
