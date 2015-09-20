@@ -17,7 +17,7 @@ namespace CortanaC
 
             AppServiceTriggerDetails triggerDetails = taskInstance.TriggerDetails as AppServiceTriggerDetails;
 
-            if (triggerDetails != null && triggerDetails.Name.Equals("VoiceCommandService"))
+            if (triggerDetails != null && triggerDetails.Name.Equals("IMCommandVoice"))
             {
                 voiceServiceConnection = VoiceCommandServiceConnection.FromAppServiceTriggerDetails(triggerDetails);
 
@@ -26,10 +26,10 @@ namespace CortanaC
                 // Perform the appropriate command depending on the operation defined in VCD
                 switch (voiceCommand.CommandName)
                 {
-                    case "old":
+                    case "oldback":
                         VoiceCommandUserMessage userMessage = new VoiceCommandUserMessage();
-                        //userMessage.DisplayMessage = "The current temperature is 23 degrees";
-                        //userMessage.SpokenMessage = "The current temperature is 23 degrees";
+                        userMessage.DisplayMessage = "The current temperature is 23 degrees";
+                        userMessage.SpokenMessage = "The current temperature is 23 degrees";
 
                         VoiceCommandResponse response = VoiceCommandResponse.CreateResponse(userMessage, null);
                         await voiceServiceConnection.ReportSuccessAsync(response);

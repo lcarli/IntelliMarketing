@@ -43,8 +43,11 @@ namespace IntelliMarketing.View
                 UserPic.SetValue(Grid.RowProperty, 1);
                 Rpainel.SetValue(Grid.ColumnProperty, 0);
                 Rpainel.SetValue(Grid.RowProperty, 1);
-                //username.SetValue(RelativePanel.RightOfProperty, "");
-                //username.SetValue(RelativePanel.AboveProperty, "txtname");
+                MainGrid.ColumnDefinitions[0].Width = new GridLength(1577 + 723);
+                MainGrid.ColumnDefinitions[1].Width = new GridLength(0);
+                MainGrid.RowDefinitions[0].Height = new GridLength(1106);
+                MainGrid.RowDefinitions[1].Height = new GridLength(2990);
+                username.Width = 1400;
             }
 
             listFaceID = new List<Face>();

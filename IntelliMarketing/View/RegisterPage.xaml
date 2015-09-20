@@ -14,7 +14,7 @@
     </Page.BottomAppBar>
 
     <Viewbox Stretch="UniformToFill">
-        <Grid Background="#6D297A">
+        <Grid x:Name="MainGrid" Background="#6D297A">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1106"/>
                 <ColumnDefinition Width="2990"/>
@@ -29,7 +29,7 @@
                     <RowDefinition Height="400"/>
                     <RowDefinition Height="1177"/>
                 </Grid.RowDefinitions>
-                <Image x:Name="UserPic" Grid.Row="0" Grid.RowSpan="2" Stretch="None" Margin="200"/>
+                <Image x:Name="UserPic" Grid.Row="0" Grid.RowSpan="2" Stretch="Uniform" Margin="200"/>
             </Grid>
             <TextBlock x:Name="tip" Grid.Column="1" Grid.Row="0" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="80" TextWrapping="Wrap" Text="Você gostaria de tirar mais fotos? Saiba que quanto mais fotos você tirar, mas preciso será o reconhecimento. Mas sou bem inteligente. Bastam duas fotos!"/>
             <RelativePanel x:Name="Rpainel" Grid.Column="1" Grid.Row="1">

@@ -131,6 +131,14 @@ namespace IntelliMarketing
 
         #endregion
 
+        #region Lista de frases da Cortana
+        private List<string> listaDeFrases = new List<string>
+        {
+            "",
+            ""
+        };
+        #endregion
+
 
         public MainPage()
         {
@@ -1248,6 +1256,13 @@ namespace IntelliMarketing
             }
         }
 
+        private string randomPhrase()
+        {
+            Random r = new Random();
+            int value = r.Next(0, listaDeFrases.Count - 1);
+            return listaDeFrases[value];
+        }
+
         #endregion
 
         #region Encode Image
@@ -1273,5 +1288,6 @@ namespace IntelliMarketing
             return file.Path;
         }
         #endregion
+
     }
 }
