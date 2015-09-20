@@ -61,8 +61,8 @@ namespace IntelliMarketing
         //MediaElement for Synth
         MediaElement mediaElement;
 
-        //isCortana?
-        bool isCortana;
+        //isSmiling?
+        bool isSmiling;
 
         //Inicializate Camera
         MediaCapture mc;
@@ -730,7 +730,7 @@ namespace IntelliMarketing
             {
                 using (Stream imageFileStream = File.OpenRead(imageFilePath))
                 {
-                    var faces = await faceServiceClient.DetectAsync(imageFileStream, false, true, true, true);
+                    var faces = await faceServiceClient.DetectAsync(imageFileStream, true, true, true, true);
                     foreach (var face in faces)
                     {
                         var rect = face.FaceRectangle;
@@ -839,6 +839,24 @@ namespace IntelliMarketing
                 try
                 {
                     Person p = await identifyFace(path);
+                    FaceLandmarks landmarks = faces[0].FaceLandmarks;
+
+                    #region verify if Smiling
+                    var UnderLipTop = landmarks.UnderLipTop;
+                    var UnderLipBottom = landmarks.UnderLipBottom;
+                    var UpperLipBottom = landmarks.UpperLipBottom;
+                    var UpperLipTop = landmarks.UpperLipTop;
+
+                    if ((UnderLipTop.Y - UpperLipBottom.Y) < (UnderLipBottom.Y - UnderLipTop.Y))
+                    {
+                        isSmiling = false;
+                    }
+                    else
+                    {
+                        isSmiling = true;
+                    }
+                    #endregion
+
                     textAge.Text = age;
                     age_genre.Visibility = Visibility.Visible;
                     polAge.Stroke = new SolidColorBrush(Colors.Black);
@@ -949,7 +967,24 @@ namespace IntelliMarketing
             }
 
             // Generate the audio stream from plain text.
-            SpeechSynthesisStream stream = await synth.SynthesizeTextToStreamAsync("Hello " + adjetivo + "! Today you're looking " + faixaEtaria + " with " + age + " years old." );
+            SpeechSynthesisStream stream;
+
+            if (isSmiling && Int16.Parse(age) < 25)
+            {
+                stream = await synth.SynthesizeTextToStreamAsync("Hello " + adjetivo + "! Today you're looking " + faixaEtaria + " with " + age + " years old. Now I understand your smile.");
+            }
+            else if (!isSmiling && Int16.Parse(age) > 25)
+            {
+                stream = await synth.SynthesizeTextToStreamAsync("Hello " + adjetivo + "! Before I tell you your age, let me tell to you to try to smile to the photo next time. Maybe you can look younger. Today you're looking " + faixaEtaria + " with " + age + " years old.");
+            }
+            else if (!isSmiling)
+            {
+                stream = await synth.SynthesizeTextToStreamAsync("Hello " + adjetivo + "! Really? No smiles? OK. Today you're looking " + faixaEtaria + " with " + age + " years old.");
+            }
+            else
+            {
+                stream = await synth.SynthesizeTextToStreamAsync("Hello " + adjetivo + "! Today you're looking " + faixaEtaria + " with " + age + " years old. Before I forget: beautiful smile!");
+            }
 
             // Send the stream to the media object.
             mediaElement.SetSource(stream, stream.ContentType);
@@ -1176,7 +1211,6 @@ namespace IntelliMarketing
 
         private void resetSetup()
         {
-            mediaElement.Stop();
             canvasImage.Visibility = Visibility.Collapsed;
             HoldCamera.Visibility = Visibility.Visible;
             age_genre.Text = "";

@@ -149,12 +149,12 @@ namespace IntelliMarketing.View
             {
                 if (App.ConnectedToInternet())
                 {
-                    //Windows.UI.Core.SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
-                    //Registering.IsActive = true;
-                    //UserPic.Visibility = Visibility.Collapsed;
-                    //saveButton.IsEnabled = false;
-                    //username.IsEnabled = false;
-                    //await listFaces(uriPhoto, username.Text);
+                    Windows.UI.Core.SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
+                    Registering.IsActive = true;
+                    UserPic.Visibility = Visibility.Collapsed;
+                    saveButton.IsEnabled = false;
+                    username.IsEnabled = false;
+                    await listFaces(uriPhoto, username.Text);
                 }
                 else
                 {
