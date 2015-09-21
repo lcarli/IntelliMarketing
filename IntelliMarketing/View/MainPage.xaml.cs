@@ -936,7 +936,16 @@ namespace IntelliMarketing
             var synth = new Windows.Media.SpeechSynthesis.SpeechSynthesizer();
 
             // Generate the audio stream from plain text.
-            SpeechSynthesisStream stream = await synth.SynthesizeTextToStreamAsync("Hello " + name + "! Let me check some products for you.");
+            SpeechSynthesisStream stream;
+           
+            if (name == "Hara")
+            {
+                stream = await synth.SynthesizeTextToStreamAsync("Hello " + name + "! You have 18 years old plus " + (Int16.Parse(age) - 18).ToString() + " years of experience. But, let me check something for you.");
+            }
+            else
+            {
+                stream = await synth.SynthesizeTextToStreamAsync("Hello " + name + "! Let me check some products for you.");
+            }
 
             // Send the stream to the media object.
             mediaElement.SetSource(stream, stream.ContentType);
@@ -1167,30 +1176,15 @@ namespace IntelliMarketing
 
         private void setProduct(string nome)
         {
-            //BitmapImage product = new BitmapImage();
-            //BitmapImage logo = new BitmapImage();
             Page.NavigationCompleted += Page_NavigationCompleted;
             switch (nome)
             {
                 case "Daibert":
                     Page.Navigate(new Uri("http://www.amazon.com/Sphero-R001USA-BB-8-App-Enabled-Droid/dp/B0107H5FJ6/ref=sr_1_1?ie=UTF8&qid=1442444059&sr=8-1&keywords=sphero+bb-8"));
-                    //ProductImage.Source = "Images/bb8.jpg"
-                    //product.UriSource = new Uri("bb8.jpg", UriKind.Relative);
-                    //ProductImage.Source = product;
-                    //ProductImage.Source = new BitmapImage(new Uri("/IntelliMarketing;component/Images/bb8.png", UriKind.Relative));
-                    //ProductName.Text = "Sphero BB-8 App-Enabled Droid";
-                    //Price.Text = "US$ 149.99";
-                    //logo.UriSource = new Uri("amazon-prime.jpg", UriKind.Relative);
-                    //logoStore.Source = logo;
+                    //Page.Navigate(new Uri("https://www.walmart.com.br/esmerilhadeira-gws-8-115-professional-bosch/3210579/pr"));
                     break;
                 case "Hara":
                     Page.Navigate(new Uri("http://www.amazon.com/Nikon-Digital-1080p-Video-MODEL/dp/B006U49XM6/ref=sr_1_2?ie=UTF8&qid=1442487669&sr=8-2&keywords=nikon+d4"));
-                    //product.UriSource = new Uri("Halo5.jpg", UriKind.Relative);
-                    //ProductImage.Source = product;
-                    //ProductName.Text = "Halo 5 - Xbox One";
-                    //Price.Text = "US$ 49.99";
-                    //logo.UriSource = new Uri("amazon-prime.jpg", UriKind.Relative);
-                    //logoStore.Source = logo;
                     break;
                 default:
                     break;
