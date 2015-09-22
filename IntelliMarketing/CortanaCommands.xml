@@ -11,10 +11,10 @@
       <Navigate/>
     </Command>
     
-    <Command Name="takePhoto">
-      <Example> Take a Picture </Example>
-      <ListenFor> [would] [you] [please] [take] [a] [fucking] Picture [of] [me] [please] </ListenFor>
-      <Feedback> Taking a picture of you </Feedback>
+    <Command Name="Product">
+      <Example> Suggest a product </Example>
+      <ListenFor> [would] [you] [please] [suggest] [a] product [for] [me] [please] </ListenFor>
+      <Feedback> Let me see who are you first! </Feedback>
       <Navigate/>
     </Command>
 

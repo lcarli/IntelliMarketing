@@ -154,9 +154,9 @@ namespace IntelliMarketing
         {
             if (e.Parameter != null && e.Parameter is string)
             {
-                if (e.Parameter.ToString() == "takePhoto")
+                if (e.Parameter.ToString() == "Product")
                 {
-                    cortanaAction("takePhoto");
+                    cortanaAction("Product");
                 }
                 else if (e.Parameter.ToString() == "old")
                 {
@@ -180,17 +180,17 @@ namespace IntelliMarketing
         #region Cortana Method
         private void cortanaAction(string command)
         {
-            if (command == "takePhoto")
+            if (command == "Product")
             {
                 timer = new DispatcherTimer();
-                timer.Interval = new TimeSpan(0, 0, 0, 7, 0);
+                timer.Interval = new TimeSpan(0, 0, 0, 3, 0);
                 timer.Tick += Timer_Tick;
                 timer.Start();
             }
             else if (command == "old")
             {
                 timer = new DispatcherTimer();
-                timer.Interval = new TimeSpan(0, 0, 0, 7, 0);
+                timer.Interval = new TimeSpan(0, 0, 0, 3, 0);
                 timer.Tick += Timer_Tick_Old;
                 timer.Start();
             }
@@ -1069,7 +1069,7 @@ namespace IntelliMarketing
             {
                 switch (args.Result.Text)
                 {
-                    case "Take a Picture":
+                    case "product":
                         await Media.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                         {
                             captureElement();
